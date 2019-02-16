@@ -1,0 +1,25 @@
+@import './variable.scss';
+
+* {
+  margin: 0;
+  padding: 0
+}
+
+html, body, .layout, .main-section, .append-section {
+  height: 100%;
+}
+
+.layout {
+  display: flex;
+
+  .main-section {
+    flex: 3;
+    background: $mainSectionBackground;
+  }
+
+  .append-section {
+    flex: 2;
+    // background: $mainSectionBackground;
+  }
+
+}
