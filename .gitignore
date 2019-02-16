@@ -1,4 +1,9 @@
 node_modules
-dataprocess
-server/data
-server/data
+dataprocess/nodes.json
+dataprocess/nodes.txt
+dataprocess/edges.json
+dataprocess/edges.txt
+server/data/nodes.json
+server/data/nodes.txt
+server/data/edges.json
+server/data/edges.txt
