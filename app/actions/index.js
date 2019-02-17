@@ -1,42 +1,7 @@
-// import api from '../api'
-// import { LOAD_DATASOURCE_SUCCESS } from '../constants/actionTypes';
-
-// export const get_data = (successCb=console.log, failCb=console.log) => {
-//   return (dispatch, getState) => {
-    
-//     api.get('/nodes')
-//     .then((resnodes) => {
-//       if(resnodes && resnodes.code === 200) {
-//         // console.warn(res.data)
-//         // dispatch({
-//         //   type: LOAD_DATASOURCE_SUCCESS,
-//         //   data: res.data
-//         // })
-
-//         api.get('/edges')
-//         .then((res) => {
-//           if(res && res.code === 200) {
-//             dispatch({
-//               type: LOAD_DATASOURCE_SUCCESS,
-//               nodes: resnodes.data,
-//               edges: res.data
-//             })
-//           }
-//         })
-//         .catch(err => {
-//           // failCb();
-//         })
-//       }
-//     })
-//     .catch(err => {
-//       // failCb();
-//     })
-//   }
-// }
 
 import api from '../api'
-import { LOAD_DATASOURCE_SUCCESS } from '../constants/actionTypes';
-import { inherits } from 'util';
+import { RECEIVE_EDGE_SUCCESS } from '../constants/actionTypes';
+
 var W3CWebSocket = require('websocket').w3cwebsocket;
 
 const INIT_TYPE = 'INIT_DATA';
@@ -57,7 +22,12 @@ export const get_data = (successCb=console.log, failCb=console.log) => {
     
     client.onmessage = function(e) {
         if (typeof e.data === 'string') {
-          console.log("Received: ", JSON.parse(e.data));
+          var record = JSON.parse(e.data);
+          console.log("Received: ", record);
+          dispatch({
+            type: RECEIVE_EDGE_SUCCESS,
+            data: record
+          })
         }
     };
 

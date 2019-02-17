@@ -2,11 +2,11 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 
-let nodefilepath = path.join(__dirname, '../data/edges.json')
+let nodefilepath = path.join(__dirname, '../data/nodes.json')
+let edgefilepath = path.join(__dirname, '../data/edges.json')
 
 var router = {
   readNodeAll(connection) {
-
       let input = fs.createReadStream(nodefilepath);
       const rl = readline.createInterface({
         input: input
@@ -19,12 +19,20 @@ var router = {
         }
         linecount++;
       })
-
-    // connection.sendUTF('233');
-    //     setTimeout(() => {
-    //     connection.sendUTF('2331');
-          
-    //     }, 1000);
+  },
+  readEdgeByLine(connection, targetlinecount) {
+    let input = fs.createReadStream(edgefilepath);
+    const rl = readline.createInterface({
+      input: input
+    });
+    var linecount = 1;
+    rl.on('line', function (data) {
+      if(linecount == targetlinecount) {
+        // console.log(data, linecount)
+        connection.sendUTF(data);
+      }
+      linecount++;
+    })
   }
 }
 
