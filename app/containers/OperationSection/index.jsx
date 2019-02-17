@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {  } from 'actions';
 // import Header from 'components/header';
 // import Footer from 'components/footer';
+import icon from 'leaflet/dist/images/marker-icon.png';
 
 import './index.scss';
 
@@ -22,6 +23,7 @@ class OperationSection extends Component {
 
     return <div className="operation-section-wrapper">
           operation section
+          <img src={icon} />
       </div>
   }
 }

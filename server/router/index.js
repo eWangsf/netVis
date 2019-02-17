@@ -2,7 +2,7 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 
-let nodefilepath = path.join(__dirname, '../data/nodes.json')
+let nodefilepath = path.join(__dirname, '../data/edges.json')
 
 var router = {
   readNodeAll(connection) {
