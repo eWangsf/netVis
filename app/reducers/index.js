@@ -9,19 +9,19 @@ const INITIAL_STATE = {
 export default function (state=INITIAL_STATE, action) {
   switch(action.type) {
     case RECEIVE_EDGE_SUCCESS: {
-      var record = action.data;
-      var nodecheckincountmap = state.nodecheckincountmap;
-      if(!nodecheckincountmap[record.src]) {
-        nodecheckincountmap[record.src] = 0;
-      }
-      nodecheckincountmap[record.src]++;
+      // var record = action.data;
+      // var nodecheckincountmap = state.nodecheckincountmap;
+      // if(!nodecheckincountmap[record.src]) {
+      //   nodecheckincountmap[record.src] = 0;
+      // }
+      // nodecheckincountmap[record.src]++;
 
       state = update(state, {
         edges: {
-          '$push': [record]
+          '$push': action.data
         },
         nodecheckincountmap: {
-          '$set': nodecheckincountmap
+          // '$set': nodecheckincountmap
         }
       });
       break;

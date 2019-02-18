@@ -6,6 +6,7 @@ var W3CWebSocket = require('websocket').w3cwebsocket;
 
 const INIT_TYPE = 'INIT_DATA';
 
+var bufferarray = [];
 export const get_data = (successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
     var client = new W3CWebSocket('ws://localhost:8081/', 'echo-protocol');
@@ -23,11 +24,15 @@ export const get_data = (successCb=console.log, failCb=console.log) => {
     client.onmessage = function(e) {
         if (typeof e.data === 'string') {
           var record = JSON.parse(e.data);
-          console.log("Received: ", record);
+          if(bufferarray.length <= 1000) {
+            bufferarray.push(record);
+          }
+          // console.log("Received: ", record);
           dispatch({
             type: RECEIVE_EDGE_SUCCESS,
-            data: record
+            data: bufferarray
           })
+          bufferarray = [];
         }
     };
 

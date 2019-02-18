@@ -10,7 +10,6 @@ import OperationSection from 'containers/OperationSection';
 
 import './index.scss';
 
-console.warn(icon)
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow

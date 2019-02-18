@@ -6,6 +6,25 @@ let nodefilepath = path.join(__dirname, '../data/nodes.json')
 let edgefilepath = path.join(__dirname, '../data/edges.json')
 
 var router = {
+  readEdgesAll(connection) {
+    let input = fs.createReadStream(edgefilepath);
+    const rl = readline.createInterface({
+      input: input
+    });
+    var startTime = (new Date()).getTime();
+    var linecount = 1;
+    rl.on('line', function (data) {
+      if(linecount <= 3000) {
+        // console.log(data, linecount)
+        connection.sendUTF(data);
+      }
+      linecount++;
+    })
+    rl.on('end', function() {
+      var endTime = (new Date()).getTime();
+      console.log((endTime - startTime) / (1000), 's');
+    })
+  },
   readNodeAll(connection) {
       let input = fs.createReadStream(nodefilepath);
       const rl = readline.createInterface({

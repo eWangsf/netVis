@@ -69,15 +69,16 @@ wsServer.on('request', function(request) {
         if(message.utf8Data === 'INIT_DATA') {
           console.log('Received INIT_REQUEST: ', message.utf8Data);
           // router.readNodeAll(connection);
-          var index = 1;
-          var readlineinterval = null;
-          readlineinterval = setInterval(() => {
-            router.readEdgeByLine(connection, index);
-            index++;
-            if(index > 100) {
-              clearInterval(readlineinterval);
-            }
-          }, 100)
+          router.readEdgesAll(connection);
+          // var index = 1;
+          // var readlineinterval = null;
+          // readlineinterval = setInterval(() => {
+          //   router.readEdgeByLine(connection, index);
+          //   index++;
+          //   if(index > 30) {
+          //     clearInterval(readlineinterval);
+          //   }
+          // }, 30)
          
         } else {
           console.log('Received Message: ', JSON.stringify(message.utf8Data) );

@@ -45,7 +45,8 @@ module.exports = {
       reducers: path.resolve(__dirname, 'app/reducers/'),
       store: path.resolve(__dirname, 'app/store/'),
       constants: path.resolve(__dirname, 'app/constants/'),
-      static: path.resolve(__dirname, 'app/static/')
+      static: path.resolve(__dirname, 'app/static/'),
+      libs: path.resolve(__dirname, 'app/libs/')
     },
     extensions: ['.js', '.jsx']
   },
