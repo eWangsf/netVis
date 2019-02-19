@@ -22,9 +22,18 @@ export const get_data = (successCb=console.log, failCb=console.log) => {
     };
     
     client.onmessage = function(e) {
+        if(e.data === 'EDGE_DATA_END') {
+          dispatch({
+            type: RECEIVE_EDGE_SUCCESS,
+            data: bufferarray
+          })
+          bufferarray = [];
+          successCb();
+          return ;
+        }
         if (typeof e.data === 'string') {
           var record = JSON.parse(e.data);
-          if(bufferarray.length <= 1000) {
+          if(bufferarray.length <= 100) {
             bufferarray.push(record);
           }
           // console.log("Received: ", record);

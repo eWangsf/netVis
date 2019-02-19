@@ -10,7 +10,8 @@ import './index.scss';
 
 var intervalclock = null;
 var map = null;
-var updateinterval = 2000;
+var heat = null;
+var updateinterval = 1000;
 
 class MainSection extends Component {
   constructor(props) {
@@ -25,25 +26,16 @@ class MainSection extends Component {
   } 
 
   componentDidMount() {
-    this.props.getData();
+    this.props.getData(() => {
+        setTimeout(() => {
+          clearInterval(intervalclock);
+        }, 2*updateinterval);
+    });
     this.mapInit();
 
     intervalclock = setInterval(() => {
-      console.log('2', this.props.edges.length)
-      // this.mapNodesUpdate();
-      if(this.props.edges.length === this.state.edgescount) {
-        clearInterval(intervalclock);
-        intervalclock = null;
-        console.warn('mapHeatMapUpdate rendering...')
-        this.mapHeatMapUpdate();
-        return ;
-      }
-      console.log('unfished', this.props.edges.length)
-      this.setState({
-        edgescount: this.props.edges.length
-      })
+      this.mapHeatMapUpdate();
     }, updateinterval);
-    // setTimeout(this.mapHeatMapUpdate, 1000);
   }
   mapInit() {
     map = L.map('map').setView(center, defaultzoom);
@@ -51,11 +43,6 @@ class MainSection extends Component {
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: copytext
     }).addTo(map);
-
-    
-    // L.marker([30.5, -97]).addTo(map)
-    //     .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-    //     .openPopup();
   }
 
   mapNodesUpdate() {
@@ -63,13 +50,23 @@ class MainSection extends Component {
   }
 
   mapHeatMapUpdate() {
-    var headmapdata = this.props.edges.map((item, index) => {
-      var _ins = Math.random().toFixed(2) 
-      return [+item.lat.toFixed(2), +item.lng.toFixed(2), parseInt(_ins * 100)];
+    var latestedges = this.props.edges.slice(this.state.edgescount, this.props.edges.length);
+    console.log(this.props.edges.length, this.state.edgescount, latestedges)
+    if(heat) {
+      latestedges.forEach((item, index) => {
+        var _ins = Math.random().toFixed(2);
+        heat.addLatLng([+item.lat.toFixed(2), +item.lng.toFixed(2), parseInt(_ins * 30)]);
+      })
+    } else {
+      var headmapdata = this.props.edges.map((item, index) => {
+        var _ins = Math.random().toFixed(2);
+        return [+item.lat.toFixed(2), +item.lng.toFixed(2), parseInt(_ins * 30)];
+      })
+      heat = L.heatLayer(headmapdata, {radius: 15}).addTo(map);
+    }
+    this.setState({
+        edgescount: this.props.edges.length
     })
-    console.warn(headmapdata)
-    var heat = L.heatLayer(headmapdata, {radius: 10}).addTo(map);
-    console.warn('mapHeatMapUpdate rendered...')
   }
 
   render() {

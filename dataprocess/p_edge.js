@@ -20,8 +20,10 @@ function edgesProcess() {
 
 		var date = new Date(infos[1]);
 
-		var tmp = `{"id": ${index}, "src": ${infos[0]}, "time": ${date.getTime()},  "lat": ${infos[2]},  "lng": ${infos[3]},  "target": ${infos[4]}}`;
-		fWrite.write(tmp + os.EOL); // 下一行
+		var tmp = `{"id": ${index}, "src": ${infos[0]}, "time": ${date.getTime()},  "lat": ${infos[2]},  "lng": ${infos[3]},  "target": ${infos[4]}}, `;
+		// if(index <= 30000) {
+			fWrite.write(tmp + os.EOL);
+		// } // 下一行
 		// console.log(index, line);
 		index ++;
 	});

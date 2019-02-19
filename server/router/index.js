@@ -14,7 +14,7 @@ var router = {
     var startTime = (new Date()).getTime();
     var linecount = 1;
     rl.on('line', function (data) {
-      if(linecount <= 3000) {
+      if(linecount <= 5000) {
         // console.log(data, linecount)
         connection.sendUTF(data);
       }
