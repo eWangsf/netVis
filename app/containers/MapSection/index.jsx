@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { get_data } from 'actions';
+import { get_data, init_data } from 'actions';
 import path from 'path';
 import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
@@ -86,7 +86,7 @@ function mapStateToProps(store) {
 function mapDispatchToProps(dispatch) {
   return {
     getData(successCb, failCb) {
-      dispatch(get_data(successCb, failCb));
+      dispatch(init_data(successCb, failCb));
     },
 
   }
