@@ -1,0 +1,23 @@
+@import '../../variable.scss';
+
+
+.operation-section-wrapper {
+  height: 100%;
+  overflow: auto;
+
+  .section {
+    margin: 5px 10px 10px 10px;
+    min-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+
+    .section-title {
+      margin: 2px 5px;
+      font-size: 14px;
+      line-height: 20px;
+      color: #333;
+    }
+  }
+
+}
+

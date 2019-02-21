@@ -49,17 +49,21 @@ function wsconnect() {
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
           if(message.utf8Data === 'INIT_DATA') {
-            var index = 1;
-            console.log('Received INIT_REQUEST: ', message.utf8Data, index, readlineinterval);
-            var readlineinterval = null;
-            readlineinterval = setInterval(() => {
-              router.readEdgeByLine(connection, index);
-              index++;
-              if(index > 500) {
-                clearInterval(readlineinterval);
-                connection.sendUTF('EDGE_DATA_END')
-              }
-            }, 8)
+            var start = 1,
+                end = 30000;
+            console.log('Received INIT_REQUEST: ', message.utf8Data, start, end);
+              // router.readEdgeByLine(connection, start, end);
+              router.saveCheckins(connection, start, end);
+            
+            // var readlineinterval = null;
+            // readlineinterval = setInterval(() => {
+            //   router.readEdgeByLine(connection, index);
+            //   index++;
+            //   if(index > 500) {
+            //     clearInterval(readlineinterval);
+            //     connection.sendUTF('EDGE_DATA_END')
+            //   }
+            // }, 8)
            
           } else {
             console.log('Received Message: ', JSON.stringify(message.utf8Data) );

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {  } from 'actions';
-// import Header from 'components/header';
-// import Footer from 'components/footer';
 import icon from 'leaflet/dist/images/marker-icon.png';
 
 import './index.scss';
@@ -22,7 +20,22 @@ class OperationSection extends Component {
   render() {
 
     return <div className="operation-section-wrapper">
-          operation section
+    
+            <div className="section clusters-section">
+              <div className="section-title">clusters</div>
+
+            </div>
+
+            <div className="section hotspots-section">
+              <div className="section-title">hotspots</div>
+
+            </div>
+
+            <div className="section record-section">
+              <div className="section-title">record</div>
+
+            </div>
+
           <img src={icon} />
       </div>
   }

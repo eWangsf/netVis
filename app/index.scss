@@ -12,10 +12,10 @@ html, body, .layout, .main-section, .append-section {
 
 .layout {
   display: flex;
+  background: $mainSectionBackground;
 
   .main-section {
     flex: 3;
-    // background: $mainSectionBackground;
   }
 
   .append-section {

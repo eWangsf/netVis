@@ -19,6 +19,7 @@
     "immutability-helper": "^3.0.0",
     "leaflet": "1.4.0",
     "morgan": "^1.9.1",
+    "mysql": "^2.16.0",
     "path": "^0.12.7",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",

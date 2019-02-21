@@ -1,6 +1,8 @@
-
+@import '../../variable.scss';
 
 .map-section-wrapper {
+  height: 100%;
+  
   #map {
     margin: 10px;
     height: calc(100% - 20px);

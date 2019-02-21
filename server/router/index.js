@@ -1,11 +1,23 @@
 const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
+const mysql = require('mysql');
+var $util = require('../util/util.js');
+var $conf = require('../conf/db.js');
+
+var pool = mysql.createPool($util.extend({}, $conf.mysql));
+console.log(pool)
 
 let nodefilepath = path.join(__dirname, '../data/nodes.json')
 let edgefilepath = path.join(__dirname, '../data/edges.json')
 
 var router = {
+  saveCheckins() {
+    pool.getConnection(function(err, connection) {
+        console.log(connection);
+        return ;
+    });
+  },
   readEdgesAll(connection) {
     let input = fs.createReadStream(edgefilepath);
     const rl = readline.createInterface({
@@ -38,6 +50,28 @@ var router = {
         }
         linecount++;
       })
+  },
+  readEdgeLines(connection, start=1, end=100) {
+    let input = fs.createReadStream(edgefilepath);
+    const rl = readline.createInterface({
+      input: input
+    });
+    var linecount = 1;
+    rl.on('line', function (data) {
+      if(linecount >= start && linecount <= end) {
+        // console.log(data, linecount)
+        setTimeout(() => {
+          connection.sendUTF(data);
+        }, linecount * 10);
+      }
+      if(linecount === end + 1) {
+        console.log('EDGE_DATA_END');
+        setTimeout(() => {
+          connection.sendUTF('EDGE_DATA_END')
+        }, (end+1) * 10);
+      }
+      linecount++;
+    })
   },
   readEdgeByLine(connection, targetlinecount) {
     let input = fs.createReadStream(edgefilepath);

@@ -51,7 +51,7 @@ class MainSection extends Component {
 
   mapHeatMapUpdate() {
     var latestedges = this.props.edges.slice(this.state.edgescount, this.props.edges.length);
-    console.log(this.props.edges.length, this.state.edgescount, latestedges)
+    console.log(this.props.edges.length, this.state.edgescount, latestedges.length, latestedges[latestedges.length - 1])
     if(heat) {
       latestedges.forEach((item, index) => {
         var _ins = Math.random().toFixed(2);
