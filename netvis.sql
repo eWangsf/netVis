@@ -18,27 +18,27 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`netvis` /*!40100 DEFAULT CHARACTER SET 
 USE `netvis`;
 
 
-/*Table structure for table `node` */
-DROP TABLE IF EXISTS `node`;
-CREATE TABLE `node` (
+/*Table structure for table `user` */
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `option` varchar(1023) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `user` */
--- insert into `user`(`openid`, `name`,`age`, `phone`) values ('openidtest', '呆呆_2', 31, '13710218584');
+-- insert into `user`(`option`) values ("");
 
-/*Table structure for table `pair` */
-DROP TABLE IF EXISTS `pair`;
-CREATE TABLE `pair` (
+/*Table structure for table `edge` */
+DROP TABLE IF EXISTS `edge`;
+CREATE TABLE `edge` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `src` int(20) NOT NULL,
   `target` int(20) NOT NULL,
   `option` varchar(1023) DEFAULT '',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`src`) references `node`(`id`),
-  FOREIGN KEY (`target`) references `node`(`id`)
+  FOREIGN KEY (`src`) references `user`(`id`),
+  FOREIGN KEY (`target`) references `user`(`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 
@@ -59,12 +59,14 @@ CREATE TABLE `location` (
 DROP TABLE IF EXISTS `checkin`;
 CREATE TABLE `checkin` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
+  `uid` int(20) NOT NULL,
   `time` varchar(20) NOT NULL,
   `lid` int(20) NOT NULL,
   `lat` varchar(20) NOT NULL,
   `lng` varchar(20) NOT NULL,
   `option` varchar(1023) DEFAULT '',
   PRIMARY KEY (`id`),
+  FOREIGN KEY (`uid`) references `user`(`id`),
   FOREIGN KEY (`lid`) references `location`(`id`),
   FOREIGN KEY (`lat`) references `location`(`lat`),
   FOREIGN KEY (`lng`) references `location`(`lng`)

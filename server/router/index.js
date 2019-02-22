@@ -1,11 +1,32 @@
 var express = require('express');
 var request = require('request');
 var router = express.Router();
+const fs = require('fs');
+const readline = require('readline');
+const path = require('path');
+let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
 
 var checkin = require('../checkin/checkin.js');
 
-router.post('/checkin/init', (req, res, next) => {
-	checkin.initCheckinData(req, res, next);
+router.get('/checkin/init', (req, res, next) => {
+	let input = fs.createReadStream(checkinfilepath);
+    const rl = readline.createInterface({
+      input: input
+		});
+		var linecount = 1;
+		rl.on('line', function (line) {
+			// if(linecount < 60000){
+			if(linecount > 2860225 && linecount <= 5000000){
+				checkin.initCheckinData(req, res, next, linecount, line);
+			}
+			linecount++;
+		});		
+		rl.on('end', function (line) {
+			res.json({
+				code: 200,
+				linecount
+			})
+		});	
 })
 
 module.exports = router;
