@@ -5,7 +5,7 @@ const responseBody = res => res.data;
 const api_point = location.hostname.includes('localhost') ? 'http://localhost:8081/api' : `${location.origin}/api`;
 const hc = axios.create({
   baseURL: api_point,
-  timeout: 10000
+  timeout: 50000
 });
 
 class Api {

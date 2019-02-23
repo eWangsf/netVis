@@ -19,45 +19,35 @@ var jsonWrite = function (res, ret) {
 };
 
 module.exports = {
-  locationInit: function(req, res, next, i) {
-    pool.getConnection(function(err, connection) {
+  getLocationHeat: function(req, res, next) {
+    var pageSize = +req.query.pageSize,
+        offset = +req.query.offset;
 
-      connection.query($sql.locationById, [i], function (err, result) {
-        if(result && result.length > 0) {
-          var record = result[0];
-          console.log(record.lid,record.lat, record.lng);
-        } else {
-          console.log(i, ' missed');
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.getLocationByPageSizeAndOffset, [pageSize, offset], function (err, result) {
+        if(typeof result === 'undefined') {
+          res.json({
+            code: 1,
+            msg: '获取热力图失败'
+          })
+          connection.release();
+          return ;
         }
+        console.log(pageSize, offset, result.length);
+        result = result.map(item => {
+          return {
+            id: item.id,
+            lat: +item.lat,
+            lng: +item.lng,
+            weight: +item.weight
+          }
+        })
+        res.json({
+          code: 200,
+          data: result
+        })
         connection.release();
       });
-
-        // connection.query($sql.checkinInsert, [
-        //   linecount,
-        //   +infos[0],
-        //   `${date.getTime()}`,
-        //   +infos[4],
-        //   infos[2],
-        //   infos[3],
-        //   ''
-        // ], function (err, result) {
-        //   if(typeof result === 'undefined') {
-        //     console.log('saveCash 查询不到用户信息', err);
-        //     // res.json({
-        //     //   code: 2,
-        //     //   msg: err
-        //     // })
-        //     connection.release();
-        //     return ;
-        //   }
-        //   // res.json({
-        //   //   code: 200,
-        //   //   data: result
-        //   // })
-        //   connection.release();
-        // })
     });
-
-
-  }
+  },
 }

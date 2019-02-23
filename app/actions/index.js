@@ -1,6 +1,7 @@
 
 import api from '../api'
 import { RECEIVE_EDGE_SUCCESS } from '../constants/actionTypes';
+import { heatPageSize } from 'constants/mapconfig';
 
 var W3CWebSocket = require('websocket').w3cwebsocket;
 
@@ -50,7 +51,7 @@ export const get_data = (successCb=console.log, failCb=console.log) => {
   }
 }
 
-export const init_data = () => {
+export const init_data = (loctioncount) => {
   return (dispatch, getState) => {
     api.get('/location/init')
     .then((res) => {
@@ -60,6 +61,20 @@ export const init_data = () => {
   }
 }
 
+
+export const get_location_heat = (loctioncount, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.get('/location/heat', {
+      pageSize: heatPageSize,
+      offset: loctioncount
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        successCb(res.data);
+      }
+    })
+  }
+}
  
  
 

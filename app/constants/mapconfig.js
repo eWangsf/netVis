@@ -2,3 +2,4 @@
 export const center = [40.7, -74];
 export const defaultzoom = 11;
 export const copytext = '&copy; netVis 2019';
+export const heatPageSize = 50000;

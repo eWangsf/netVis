@@ -36,6 +36,9 @@ router.get('/location/init', (req, res, next) => {
 	}
 })
 
+router.get('/location/heat', (req, res, next) => {
+		location.getLocationHeat(req, res, next);
+})
 module.exports = router;
 
 
