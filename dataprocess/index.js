@@ -4,9 +4,9 @@ var fs = require('fs');
 var os = require('os');
 
 
-function nodesProcess() {
-	var fReadName = './nodes.txt';
-	var fWriteName = './nodes.json';
+function edgesProcess() {
+	var fReadName = './edge.txt';
+	var fWriteName = './edge.json';
 	var fRead = fs.createReadStream(fReadName);
 	var fWrite = fs.createWriteStream(fWriteName);
 
@@ -18,9 +18,10 @@ function nodesProcess() {
 
 	objReadline.on('line', (line)=>{
 		var users = line.split('\t');
+
 		var tmp = `{"id": ${index}, "src": ${users[0]}, "target": ${users[1]}}`;
 		fWrite.write(tmp + os.EOL); // 下一行
-		// console.log(index, line);
+		
 		index ++;
 	});
 
@@ -30,9 +31,9 @@ function nodesProcess() {
 }
 
 
-function edgesProcess() {
-	var fReadName = './edges.txt';
-	var fWriteName = './edges.json';
+function checkinProcess() {
+	var fReadName = './checkin.txt';
+	var fWriteName = './checkin.json';
 	var fRead = fs.createReadStream(fReadName);
 	var fWrite = fs.createWriteStream(fWriteName);
 
@@ -44,12 +45,11 @@ function edgesProcess() {
 
 	objReadline.on('line', (line)=>{
 		var infos = line.split('\t');
-
 		var date = new Date(infos[1]);
 
-		var tmp = `{"id": ${index}, "src": ${infos[0]}, "time": ${date.getTime()},  "lat": ${infos[2]},  "lng": ${infos[3]},  "target": ${infos[4]}}`;
+		var tmp = `{"id": ${index}, "src": ${infos[0]}, "time": ${date.getTime()},  "lat": ${infos[2]},  "lng": ${infos[3]},  "lid": ${infos[4]}}`;
 		fWrite.write(tmp + os.EOL); // 下一行
-		// console.log(index, line);
+		
 		index ++;
 	});
 
@@ -58,5 +58,7 @@ function edgesProcess() {
 	});
 }
 
-nodesProcess()
+// edgesProcess();
+checkinProcess();
+
 

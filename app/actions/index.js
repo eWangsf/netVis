@@ -52,7 +52,7 @@ export const get_data = (successCb=console.log, failCb=console.log) => {
 
 export const init_data = () => {
   return (dispatch, getState) => {
-    api.get('/checkin/init')
+    api.get('/location/init')
     .then((res) => {
       debugger
     })

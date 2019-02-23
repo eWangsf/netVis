@@ -36,9 +36,7 @@ CREATE TABLE `edge` (
   `src` int(20) NOT NULL,
   `target` int(20) NOT NULL,
   `option` varchar(1023) DEFAULT '',
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`src`) references `user`(`id`),
-  FOREIGN KEY (`target`) references `user`(`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 
@@ -48,11 +46,10 @@ CREATE TABLE `location` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `lat` varchar(20) NOT NULL,
   `lng` varchar(20) NOT NULL,
+  `weight` int(20) DEFAULT 0,
   `option` varchar(1023) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
-
-
 
 
 /*Table structure for table `checkin` */
@@ -65,9 +62,5 @@ CREATE TABLE `checkin` (
   `lat` varchar(20) NOT NULL,
   `lng` varchar(20) NOT NULL,
   `option` varchar(1023) DEFAULT '',
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`uid`) references `user`(`id`),
-  FOREIGN KEY (`lid`) references `location`(`id`),
-  FOREIGN KEY (`lat`) references `location`(`lat`),
-  FOREIGN KEY (`lng`) references `location`(`lng`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

@@ -7,6 +7,7 @@ const path = require('path');
 let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
 
 var checkin = require('../checkin/checkin.js');
+var location = require('../location/location.js');
 
 router.get('/checkin/init', (req, res, next) => {
 	let input = fs.createReadStream(checkinfilepath);
@@ -27,6 +28,12 @@ router.get('/checkin/init', (req, res, next) => {
 				linecount
 			})
 		});	
+})
+
+router.get('/location/init', (req, res, next) => {
+	for(var i = 0; i < 100; i++) {
+		location.locationInit(req, res, next, i);
+	}
 })
 
 module.exports = router;
