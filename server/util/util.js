@@ -8,5 +8,16 @@ module.exports = {
                     (target[key] === void 0 && (target[key] = source[key]));
         }
         return target;
+    },
+    mapLocations: function (locations) {
+        locations = locations.map(item => {
+            return {
+              id: item.id,
+              lat: +item.lat,
+              lng: +item.lng,
+              weight: +item.weight
+            }
+          })
+        return locations;
     }
 }

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { get_location_heat } from 'actions';
+import debounce from 'debounce';
 import path from 'path';
+
+import { get_location_heat, get_locations_in_bound } from 'actions';
 import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
 import { center, defaultzoom, copytext, heatPageSize } from 'constants/mapconfig';
@@ -10,23 +12,32 @@ import './index.scss';
 
 var map = null;
 var heat = null;
+var triggerBoundDataZoom = 12;
+var triggerLocationDetailRenderZoom = 17;
+var debouncetime = 400;
+
+var warn = (msg) => {
+  console.warn(msg);
+}
 
 class MainSection extends Component {
   constructor(props) {
     super(props);
 
     this.mapInit = this.mapInit.bind(this);
+    this.mapEventHandler = this.mapEventHandler.bind(this);
     this.heatMap = this.heatMap.bind(this);
     this.mapHeatMapUpdate = this.mapHeatMapUpdate.bind(this)
     this.locationDetailRender = this.locationDetailRender.bind(this);
 
     this.state = {
       locationcount: 0,
+      locationmarkers: [],
     }
   } 
 
   componentDidMount() {
-    this.heatMap();
+    // this.heatMap();
     this.mapInit();
   }
 
@@ -37,13 +48,17 @@ class MainSection extends Component {
         attribution: copytext
     }).addTo(map);
 
-    map.on('zoomstart', function (evt) {
-      var zoomlevel = evt.target._zoom;
-      console.log(zoomlevel);
-      if(zoomlevel > 13) {
-        this.locationDetailRender();
-      }
-    }.bind(this))
+    map.on('zoom', debounce(this.mapEventHandler, debouncetime));
+    map.on('drag', debounce(this.mapEventHandler, debouncetime));
+
+  }
+
+  mapEventHandler() {
+    var zoomlevel = map.getZoom();
+
+    if(zoomlevel >= triggerBoundDataZoom) {
+      this.getBoundLocationsData();
+    }
   }
 
   heatMap() {
@@ -73,10 +88,55 @@ class MainSection extends Component {
     })
   }
 
+  getBoundLocationsData() {
+    warn('---- trigger: getBoundLocationsData ---')
+
+    var mapbound = map.getBounds(),
+        latrange = [mapbound._southWest.lat, mapbound._northEast.lat],
+        lngrange = [mapbound._southWest.lng, mapbound._northEast.lng];
+
+    this.props.getLocationsByBound(latrange, lngrange, (locations) => {
+      warn(`getBoundLocationsData success: ${locations.length} locations searched`);
+      
+      this.locationDetailRender();
+      
+    });
+  }
   locationDetailRender() {
-    L.marker(center).addTo(map)
-    .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-    .openPopup();
+    this.clearLocationMarkers();
+    
+    var zoomlevel = map.getZoom();
+    console.warn('zoomlevel ', zoomlevel)
+    if(zoomlevel <= triggerLocationDetailRenderZoom) {
+      return ;
+    }
+
+    warn('---- trigger: locationDetailRender ---');
+
+    var mapbound = map.getBounds(),
+        latrange = [mapbound._southWest.lat, mapbound._northEast.lat],
+        lngrange = [mapbound._southWest.lng, mapbound._northEast.lng];
+
+    var inboundlocation = this.props.boundlocations.filter(item => item.lat > latrange[0] && item.lat < latrange[1] && item.lng > lngrange[0] && item.lng < lngrange[1]);
+    var locationmarkers = [];
+
+    inboundlocation.forEach(item => {
+      var marker = L.marker([item.lat, item.lng]).addTo(map)
+        .bindPopup(`record: ${JSON.stringify(item)}, zoom: ${map.getZoom()} `)
+        .openPopup();
+      locationmarkers.push(marker);
+    })
+
+    this.setState({
+      locationmarkers: locationmarkers
+    })
+    warn(`locationDetailRendered ${locationmarkers.length} markers rendered`)
+
+  }
+  clearLocationMarkers() {
+    this.state.locationmarkers.forEach(item => {
+      map.removeLayer(item)
+    })
   }
 
   render() {
@@ -88,8 +148,7 @@ class MainSection extends Component {
 
 function mapStateToProps(store) {
   return {
-    nodecheckincountmap: store.nodecheckincountmap,
-    edges: store.edges
+    boundlocations: store.boundlocations,
   }
 }
 
@@ -98,6 +157,9 @@ function mapDispatchToProps(dispatch) {
     getHeat(loctioncount, successCb, failCb) {
       dispatch(get_location_heat(loctioncount, successCb, failCb));
     },
+    getLocationsByBound(latrange, lngrange, successCb, failCb) {
+      dispatch(get_locations_in_bound(latrange, lngrange, successCb, failCb))
+    }
 
   }
 }

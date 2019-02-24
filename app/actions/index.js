@@ -1,6 +1,6 @@
 
 import api from '../api'
-import { RECEIVE_EDGE_SUCCESS } from '../constants/actionTypes';
+import { RECEIVE_EDGE_SUCCESS, GET_BOUND_LOCATIONS_SUCCESS } from '../constants/actionTypes';
 import { heatPageSize } from 'constants/mapconfig';
 
 var W3CWebSocket = require('websocket').w3cwebsocket;
@@ -62,6 +62,9 @@ export const init_data = (loctioncount) => {
 }
 
 
+var bound_seed = 0;
+var cancel_seed = null;
+
 export const get_location_heat = (loctioncount, successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
     api.get('/location/heat', {
@@ -75,6 +78,42 @@ export const get_location_heat = (loctioncount, successCb=console.log, failCb=co
     })
   }
 }
+
+export const get_locations_in_bound = (latrange, lngrange, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    var now = (new Date()).getTime();
+    if(cancel_seed) {
+      cancel_seed(`${bound_seed} canceled`);
+    }
+
+    // console.warn('get_locations_in_bound', bound_seed)
+    var { request, cancelseed } = api.post('/location/inbound', {
+      latrange, 
+      lngrange,
+      bound_seed: now
+    }, 1);
+
+    bound_seed = now;
+    cancel_seed = cancelseed;
+    
+    request.then(res => {
+      if(res && res.code === 200 && bound_seed === res.bound_seed) {
+        // console.warn('get_locations_in_bound', res.data, res.bound_seed)
+        dispatch({
+          type: GET_BOUND_LOCATIONS_SUCCESS,
+          data: res.data
+        })
+        successCb(res.data);
+        bound_seed = 0;
+        cancel_seed = null;
+      }
+    })
+    .catch(err => {
+      console.log(err, err.message)
+    })
+  }
+}
+
  
  
 

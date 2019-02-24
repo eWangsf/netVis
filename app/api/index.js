@@ -1,4 +1,5 @@
 import axios from 'axios';
+const CancelToken = axios.CancelToken;
 
 const responseBody = res => res.data;
 
@@ -18,7 +19,21 @@ class Api {
         .then(responseBody)
     }
 
-    post(path, data, withToken, verison) {
+    post(path, data, withcancel=0, withToken, verison) {
+      if(withcancel) {
+        var cancelseed = undefined;
+        var request = hc.post(path, data, {
+          cancelToken: new CancelToken(function executor(c) {
+            // An executor function receives a cancel function as a parameter
+            cancelseed = c;
+          })
+        }, {headers: this.getHeaders(withToken, verison)})
+        .then(responseBody)
+        return {
+          cancelseed,
+          request
+        }
+      }
       return hc.post(path, data, {headers: this.getHeaders(withToken, verison)})
         .then(responseBody)
     }

@@ -34,14 +34,7 @@ module.exports = {
           return ;
         }
         console.log(pageSize, offset, result.length);
-        result = result.map(item => {
-          return {
-            id: item.id,
-            lat: +item.lat,
-            lng: +item.lng,
-            weight: +item.weight
-          }
-        })
+        result = $util.mapLocations(result);
         res.json({
           code: 200,
           data: result
@@ -50,4 +43,33 @@ module.exports = {
       });
     });
   },
+  getLocationInBound: function(req, res, next) {
+    var params = req.body;
+    var latrange = params.latrange,
+        lngrange = params.lngrange,
+        bound_seed = params.bound_seed;
+
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.getLocationInBound, [latrange[0], latrange[1], lngrange[0], lngrange[1]], function (err, result) {
+        if(typeof result === 'undefined') {
+          res.json({
+            code: 1,
+            msg: '获取打卡点失败'
+          })
+          connection.release();
+          return ;
+        }
+        result = $util.mapLocations(result);
+
+        res.json({
+          code: 200,
+          bound_seed: bound_seed,
+          data: result
+        });
+        connection.release();
+      });
+    });
+
+    
+  }
 }
