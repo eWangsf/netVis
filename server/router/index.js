@@ -9,39 +9,16 @@ let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
 var checkin = require('../checkin/checkin.js');
 var location = require('../location/location.js');
 
-router.get('/checkin/init', (req, res, next) => {
-	let input = fs.createReadStream(checkinfilepath);
-    const rl = readline.createInterface({
-      input: input
-		});
-		var linecount = 1;
-		rl.on('line', function (line) {
-			// if(linecount < 60000){
-			if(linecount > 2860225 && linecount <= 5000000){
-				checkin.initCheckinData(req, res, next, linecount, line);
-			}
-			linecount++;
-		});		
-		rl.on('end', function (line) {
-			res.json({
-				code: 200,
-				linecount
-			})
-		});	
-})
-
-router.get('/location/init', (req, res, next) => {
-	for(var i = 0; i < 100; i++) {
-		location.locationInit(req, res, next, i);
-	}
-})
-
 router.get('/location/heat', (req, res, next) => {
 		location.getLocationHeat(req, res, next);
 })
 
-router.post('/location/inbound', (req, res, next) => {
+router.post('/location/inboundlocations', (req, res, next) => {
 	location.getLocationInBound(req, res, next);
+})
+
+router.post('/location/inboundcheckins', (req, res, next) => {
+	checkin.getInBound(req, res, next);
 })
 
 module.exports = router;

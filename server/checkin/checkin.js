@@ -5,10 +5,6 @@ var $conf = require('../conf/db.js');
 var $util = require('../util/util.js');
 var $sql = require('./checkinsql.js');
 
-const readline = require('readline');
-let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
-
-
 var pool = mysql.createPool($util.extend({}, $conf.mysql));
 
 var jsonWrite = function (res, ret) {
@@ -23,33 +19,61 @@ var jsonWrite = function (res, ret) {
 };
 
 module.exports = {
-  initCheckinData: function(req, res, next, linecount, line) {
-    pool.getConnection(function(err, connection) {
-      var infos = line.split('\t');
-      var date = new Date(infos[1]);
+  getInBound: function(req, res, next) {
+    var params = req.body,
+        latrange = params.latrange,
+        lngrange = params.lngrange;
 
-      connection.query($sql.checkinInsert, [
-        linecount,
-        +infos[0],
-        `${date.getTime()}`,
-        +infos[4],
-        infos[2],
-        infos[3],
-        ''
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.checkinByBound, [
+        latrange[0],
+        latrange[1],
+        lngrange[0],
+        lngrange[1]
       ], function (err, result) {
         if(typeof result === 'undefined') {
-          console.log('saveCash 查询不到用户信息', err);
-          // res.json({
-          //   code: 2,
-          //   msg: err
-          // })
+          res.json({
+            code: 1,
+            msg: '查询不到签到信息'
+          })
           connection.release();
           return ;
         }
-        // res.json({
-        //   code: 200,
-        //   data: result
-        // })
+
+        var checkinlocationmap = {};
+        result.forEach(item => {
+          if(!checkinlocationmap[item.lid]) {
+            checkinlocationmap[item.lid] = {
+              lid: item.lid,
+              weight: 0,
+              lat: undefined,
+              lng: undefined,
+              usermap: {}
+            };
+          }
+          if(!checkinlocationmap[item.lid]['usermap'][item.uid]) {
+            checkinlocationmap[item.lid]['usermap'][item.uid] = {
+              uid: item.uid,
+              weight: 0,
+              records: []
+            }
+          }
+          var lidobjinmap = checkinlocationmap[item.lid];
+          lidobjinmap.weight ++;
+          lidobjinmap.lat = +item.lat;
+          lidobjinmap.lng = +item.lng;
+          lidobjinmap.usermap[item.uid].weight ++;
+          lidobjinmap.usermap[item.uid].records.push(item);
+          checkinlocationmap[item.lid] = lidobjinmap;
+        })
+        var locationsmap = Object.values(checkinlocationmap);
+        locationsmap.forEach(item => {
+          item.usermap = Object.values(item.usermap)
+        })
+        res.json({
+          code: 200,
+          data: locationsmap
+        })
         connection.release();
       })
     });
