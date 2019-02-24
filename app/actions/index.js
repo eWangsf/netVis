@@ -1,6 +1,6 @@
 
 import api from '../api'
-import { GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS } from '../constants/actionTypes';
+import { GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from '../constants/actionTypes';
 import { heatPageSize } from 'constants/mapconfig';
 import { mocklocations, mocklocationusers } from 'constants/test';
 
@@ -82,6 +82,23 @@ export const get_location_checkins_in_bound = (latrange, lngrange, successCb=con
           data: res.data
         })
         successCb(res.data);
+      }
+    })
+  }
+}
+
+export const get_location_detail = (lid, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.get('/location/checkin', {
+      lid
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        dispatch({
+          type: GET_LOCATION_CHECKINS,
+          data: res.data
+        })
+        successCb();
       }
     })
   }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import debounce from 'debounce';
 
-import { get_location_heat, get_locations_in_bound, get_location_checkins_in_bound } from 'actions';
+import { get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
 import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
 import * as d3 from "d3";
@@ -144,6 +144,7 @@ class MainSection extends Component {
       var marker = L.marker([item.lat, item.lng])
         .bindPopup(`record: ${JSON.stringify(item)}, zoom: ${map.getZoom()} `)
         .openPopup();
+      marker.on('click', this.locationSelectHandler.bind(this, item));
       locationmarkers.push(marker);
     })
     var locationmarkersLayer = L.layerGroup(locationmarkers).addTo(map);
@@ -179,12 +180,12 @@ class MainSection extends Component {
     boundusers.forEach((locationitem, locationindex) => {
       var degreescale = d3.scaleLinear().domain([0, locationitem.usermap.length]).range([0, 2 * Math.PI]);
       locationitem.usermap.forEach((useritem, userindex) => {
-        // console.warn(locationitem, userindex, Math.cos(degreescale(userindex)), 0.000001 * Math.sin(degreescale(userindex)))
         var umarker = L.circleMarker([locationitem.lat + 0.00001 * Math.cos(degreescale(userindex)), locationitem.lng + 0.00001 * Math.sin(degreescale(userindex))], {
           fillOpacity: 0.5,
           fillColor: '#f00',
           radius: Math.max(6, useritem.weight*10)
         })
+        umarker.on('click', this.locationUserSelectHandler.bind(this, locationitem, useritem));
         locationusers.push(umarker);
       });
     })
@@ -194,8 +195,18 @@ class MainSection extends Component {
       locationusersLayer: locationusersLayer
     })
     warn(`locationUsersRender ${locationusers.length} usermarkers rendered`);
-
   }
+
+  locationSelectHandler(location) {
+    console.warn('locationSelectHandler', location);
+    this.props.getLocationDetail(location.id, () => {
+      debugger
+    });
+  }
+  locationUserSelectHandler(locationitem, useritem) {
+    console.warn('locationUserSelectHandler', locationitem, useritem)
+  }
+
   clearLocationMarkers() {
     if(map.hasLayer(this.state.locationmarkersLayer)) {
       map.removeLayer(this.state.locationmarkersLayer)
@@ -218,7 +229,8 @@ class MainSection extends Component {
 function mapStateToProps(store) {
   return {
     boundlocations: store.boundlocations,
-    boundusers: store.boundusers
+    boundusers: store.boundusers,
+    checkins: store.checkins
   }
 }
 
@@ -232,6 +244,9 @@ function mapDispatchToProps(dispatch) {
     },
     getLocationUser(latrange, lngrange, successCb, failCb) {
       dispatch(get_location_checkins_in_bound(latrange, lngrange, successCb, failCb));
+    },
+    getLocationDetail(lid, successCb, failCb) {
+      dispatch(get_location_detail(lid, successCb, failCb));
     }
 
   }

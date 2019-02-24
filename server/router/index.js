@@ -21,6 +21,10 @@ router.post('/location/inboundcheckins', (req, res, next) => {
 	checkin.getInBound(req, res, next);
 })
 
+router.get('/location/checkin', (req, res, next) => {
+	checkin.getByLocation(req, res, next);
+})
+
 module.exports = router;
 
 

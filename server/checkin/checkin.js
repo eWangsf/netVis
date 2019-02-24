@@ -79,5 +79,26 @@ module.exports = {
     });
 
 
+  },
+  getByLocation: function(req, res, next) {
+    var lid = +req.query.lid;
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.checkinByLocationId, [lid], function (err, result) {
+        if(typeof result === 'undefined') {
+          res.json({
+            code: 1,
+            msg: '获取签到记录失败'
+          });
+          connection.release();
+          return ;
+        }
+        res.json({
+          code: 200,
+          data: result,
+          lid
+        })
+        connection.release();
+      });     
+    });
   }
 }
