@@ -9,10 +9,19 @@ var cancel_seed = null;
 
 export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
-    api.post('/checkin/bound', {
+    var now = (new Date()).getTime();
+    if(cancel_seed) {
+      cancel_seed(`${bound_seed} canceled`);
+    }
+
+    var { request, cancelseed } = api.post('/checkin/bound', {
       bounds
-    })
-    .then(res => {
+    }, 1);
+
+    bound_seed = now;
+    cancel_seed = cancelseed;
+    
+    request.then(res => {
       if(res && res.code === 200) {
         var result = res.data;
         result = result.map(item => {
@@ -20,6 +29,8 @@ export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.
             coordinates: [+item.lng, +item.lat],
             name: `checkin-${item.id}`,
             lid: item.id,
+            uid: item.uid,
+            time: item.time
           }
         })
         dispatch({
@@ -27,7 +38,12 @@ export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.
           data: result
         })
         successCb();
+        bound_seed = 0;
+        cancel_seed = null;
       }
+    })
+    .catch(err => {
+      console.log(err, err.message)
     })
   }
 }

@@ -3,7 +3,7 @@ export const center = {
   lat: 40.7,
   lng: -74
 };
-export const defaultzoom = 11;
+export const defaultzoom = 12;
 export const maxZoom = 20;
 export const minZoom = 8;
 export const copytext = '&copy; netVis 2019';

@@ -5,7 +5,7 @@ import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
 import { StaticMap } from 'react-map-gl';
 import { IconLayer } from 'libs/glmaps';
-import DeckGL, { WebMercatorViewport, LineLayer, ScatterplotLayer } from 'deck.gl';
+import DeckGL, { MapController } from 'deck.gl';
 import * as d3 from "d3";
 import { AntPath, antPath } from 'leaflet-ant-path';
 
@@ -48,8 +48,8 @@ class MainSection extends Component {
 
   componentDidMount() {
     this.heatMap = debounce(this.heatMap, debouncetime)
-
   }
+
   mapLoaded() {
     const mapGL = this.map.getMap();
     const bounds = mapGL.getBounds();
@@ -61,7 +61,8 @@ class MainSection extends Component {
     })
     this.heatMap();
   }
-  handleViewStateChange({viewState}) {
+
+  handleViewStateChange({ viewState }) {
     const mapGL = this.map.getMap();
     const bounds = mapGL.getBounds();
     this.setState({
@@ -88,11 +89,8 @@ class MainSection extends Component {
     if(!zoomLevels[zoom]) {
       return ;
     }
-    var locations = zoomLevels[zoom].points
+    var locations = zoomLevels[zoom].points;
     console.log(locations);
-    // this.props.getLocationDetail(location.id, () => {
-
-    // });
 
   }
 
@@ -100,6 +98,7 @@ class MainSection extends Component {
   }
   bindMap(map) {
     this.map = map;
+
   }
   
   render() {

@@ -41,36 +41,37 @@ module.exports = {
           return ;
         }
 
-        var checkinlocationmap = {};
-        result.forEach(item => {
-          if(!checkinlocationmap[item.lid]) {
-            checkinlocationmap[item.lid] = {
-              lid: item.lid,
-              weight: 0,
-              lat: undefined,
-              lng: undefined,
-              usermap: {}
-            };
-          }
-          if(!checkinlocationmap[item.lid]['usermap'][item.uid]) {
-            checkinlocationmap[item.lid]['usermap'][item.uid] = {
-              uid: item.uid,
-              weight: 0,
-              records: []
-            }
-          }
-          var lidobjinmap = checkinlocationmap[item.lid];
-          lidobjinmap.weight ++;
-          lidobjinmap.lat = +item.lat;
-          lidobjinmap.lng = +item.lng;
-          lidobjinmap.usermap[item.uid].weight ++;
-          lidobjinmap.usermap[item.uid].records.push(item);
-          checkinlocationmap[item.lid] = lidobjinmap;
-        })
-        var locationsmap = Object.values(checkinlocationmap);
-        locationsmap.forEach(item => {
-          item.usermap = Object.values(item.usermap)
-        })
+        // var checkinlocationmap = {};
+        // result.forEach(item => {
+        //   if(!checkinlocationmap[item.lid]) {
+        //     checkinlocationmap[item.lid] = {
+        //       lid: item.lid,
+        //       weight: 0,
+        //       lat: undefined,
+        //       lng: undefined,
+        //       usermap: {}
+        //     };
+        //   }
+        //   if(!checkinlocationmap[item.lid]['usermap'][item.uid]) {
+        //     checkinlocationmap[item.lid]['usermap'][item.uid] = {
+        //       uid: item.uid,
+        //       weight: 0,
+        //       records: []
+        //     }
+        //   }
+        //   var lidobjinmap = checkinlocationmap[item.lid];
+        //   lidobjinmap.weight ++;
+        //   lidobjinmap.lat = +item.lat;
+        //   lidobjinmap.lng = +item.lng;
+        //   lidobjinmap.usermap[item.uid].weight ++;
+        //   lidobjinmap.usermap[item.uid].records.push(item);
+        //   checkinlocationmap[item.lid] = lidobjinmap;
+        // })
+        // var locationsmap = Object.values(checkinlocationmap);
+        // locationsmap.forEach(item => {
+        //   item.usermap = Object.values(item.usermap)
+        // })
+
         res.json({
           code: 200,
           data: result
