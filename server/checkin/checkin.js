@@ -1,5 +1,3 @@
-var path = require('path');
-const fs = require('fs');
 var mysql = require('mysql');
 var $conf = require('../conf/db.js');
 var $util = require('../util/util.js');

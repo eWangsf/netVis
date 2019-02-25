@@ -4,12 +4,12 @@ import debounce from 'debounce';
 import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
 import { StaticMap } from 'react-map-gl';
-import { IconLayer } from 'libs/glmaps';
+import { IconLayer, ArcLayer } from 'libs/glmaps';
 import DeckGL, { MapController } from 'deck.gl';
 import * as d3 from "d3";
 import { AntPath, antPath } from 'leaflet-ant-path';
 
-import { get_heat_in_bound, get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
+import { get_heat_in_bound, get_checkin_group_detail, get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
 import { center, defaultzoom, maxZoom, minZoom, copytext, heatPageSize, MAPBOX_TOKEN } from 'constants/mapconfig';
 import './index.scss';
 
@@ -24,6 +24,10 @@ var warn = (msg) => {
   console.warn(msg);
 }
 
+var bearing = 0;
+var pitch = 20;
+var altitude = 0;
+
 class MainSection extends Component {
   constructor(props) {
     super(props);
@@ -36,7 +40,8 @@ class MainSection extends Component {
         height: 400,
         latitude: center.lat,
         longitude: center.lng,
-        zoom: defaultzoom
+        zoom: defaultzoom,
+        pitch: pitch
       },
       locationcount: 0,
       bounds: {
@@ -89,8 +94,10 @@ class MainSection extends Component {
     if(!zoomLevels[zoom]) {
       return ;
     }
-    var locations = zoomLevels[zoom].points;
-    console.log(locations);
+    var checkingroups = zoomLevels[zoom].points;
+    console.log(checkingroups);
+
+    this.props.getCheckinGroupDetail(checkingroups);
 
   }
 
@@ -124,10 +131,26 @@ class MainSection extends Component {
               id: 'icon-layer',
               showCluster: true,
               onClick: this.iconClickHandler.bind(this),
+            }),
+            new ArcLayer({
+              data: this.props.edges,
+              showBrushAnimation: true,
+              viewState: {
+                latitude: this.state.viewState.latitude,
+                longitude: this.state.viewState.longitude,
+                maxZoom: maxZoom,
+                minZoom: minZoom,
+                pitch: pitch,
+                zoom: this.state.viewState.zoom
+              },
+              id: 'arc-layer',
+              showCluster: true
             })
           ]}
         >
           <StaticMap
+                bearing={bearing}
+                pitch={pitch}
               ref={this.bindMap.bind(this)}
               onLoad={this.mapLoaded.bind(this)}
               mapStyle="mapbox://styles/mapbox/dark-v9"
@@ -143,6 +166,7 @@ class MainSection extends Component {
 function mapStateToProps(store) {
   return {
     heatmapdata: store.heatmapdata,
+    edges: store.edges,
     boundlocations: store.boundlocations,
     boundusers: store.boundusers,
     checkins: store.checkins,
@@ -157,6 +181,9 @@ function mapDispatchToProps(dispatch) {
     getHeatByBound(bounds, successCb, failCb) {
       dispatch(get_heat_in_bound(bounds, successCb, failCb))
     },
+    getCheckinGroupDetail(checkins, successCb, failCb) {
+      dispatch(get_checkin_group_detail(checkins, successCb, failCb))
+    }
     // getLocationsByBound(latrange, lngrange, successCb, failCb) {
     //   dispatch(get_locations_in_bound(latrange, lngrange, successCb, failCb))
     // },

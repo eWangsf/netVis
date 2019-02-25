@@ -22,7 +22,12 @@ class OperationSection extends Component {
     return <div className="operation-section-wrapper">
     
             <div className="section clusters-section">
-              <div className="section-title">clusters</div>
+              <div className="section-title">clusters 
+                <p>checkingroups: {this.props.checkingroups.length}</p>
+                <p>uids: {this.props.uids.length}</p>
+                <p>lids: {this.props.lids.length}</p>
+                <p>edges: {this.props.edges.length}</p>
+              </div>
 
             </div>
 
@@ -43,6 +48,10 @@ class OperationSection extends Component {
 
 function mapStateToProps(store) {
   return {
+    lids: store.lids,
+    uids: store.uids,
+    checkingroups: store.checkingroups,
+    edges: store.edges
   }
 }
 

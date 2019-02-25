@@ -1,6 +1,6 @@
 
 import api from '../api'
-import { GET_HEATMAP_SUCCESS, GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from '../constants/actionTypes';
+import { GET_HEATMAP_SUCCESS, GET_BOUND_LOCATIONS_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from '../constants/actionTypes';
 import { heatPageSize } from 'constants/mapconfig';
 import { mocklocations, mocklocationusers } from 'constants/test';
 
@@ -44,6 +44,38 @@ export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.
     })
     .catch(err => {
       console.log(err, err.message)
+    })
+  }
+}
+
+export const get_checkin_group_detail = (checkins, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    
+    var lmap = {};
+    var umap = {};
+    checkins.forEach(item => {
+      lmap[item.lid] = 1;
+      umap[item.uid] = 1;
+    });
+
+    dispatch({
+      type: SAVE_CHECKIN_GROUPS,
+      data: checkins,
+      uids: Object.keys(umap),
+      lids: Object.keys(lmap)
+    })
+    var edgespromise = api.post('/edges/users', {
+      uids: Object.keys(umap)
+    })
+    .then(res => {
+      if(res && res.data && (res.data instanceof Array)) {
+        dispatch({
+          type: GET_EDGES_SUCCESS,
+          data: res.data
+        })
+      } else {
+        console.warn(res.data);
+      }
     })
   }
 }

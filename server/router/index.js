@@ -8,10 +8,15 @@ let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
 
 var checkin = require('../checkin/checkin.js');
 var location = require('../location/location.js');
+var edge = require('../edge/edge.js');
 
 
 router.post('/checkin/bound',  (req, res, next) => {
 	checkin.getInBound(req, res, next);
+})
+
+router.post('/edges/users', (req, res, next) => {
+	edge.getEdgesByOneSide(req, res, next);
 })
 
 
