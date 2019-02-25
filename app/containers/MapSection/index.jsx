@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import debounce from 'debounce';
-
-import { get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
 import L from 'leaflet';
 import {} from 'libs/leaflet-heat';
+import { StaticMap } from 'react-map-gl';
+import { IconLayer } from 'libs/glmaps';
+import DeckGL, { LineLayer, ScatterplotLayer } from 'deck.gl';
 import * as d3 from "d3";
 import { AntPath, antPath } from 'leaflet-ant-path';
-import { center, defaultzoom, copytext, heatPageSize } from 'constants/mapconfig';
 
+import { get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
+import { center, defaultzoom, maxZoom, minZoom, copytext, heatPageSize, MAPBOX_TOKEN } from 'constants/mapconfig';
 import './index.scss';
 
 var map = null;
@@ -26,7 +28,6 @@ class MainSection extends Component {
   constructor(props) {
     super(props);
 
-    this.mapInit = this.mapInit.bind(this);
     this.mapEventHandler = this.mapEventHandler.bind(this);
     this.heatMap = this.heatMap.bind(this);
     this.mapHeatMapUpdate = this.mapHeatMapUpdate.bind(this)
@@ -34,6 +35,14 @@ class MainSection extends Component {
     this.locationUsersRender = this.locationUsersRender.bind(this);
 
     this.state = {
+      viewState: {
+        width: 400,
+        height: 400,
+        latitude: center.lat,
+        longitude: center.lng,
+        zoom: defaultzoom
+      },  
+      locationheats: [],
       locationcount: 0,
       locationmarkersLayer: undefined,
       locationusersLayer: undefined
@@ -41,35 +50,12 @@ class MainSection extends Component {
   } 
 
   componentDidMount() {
-    // this.heatMap();
-    this.mapInit();
   }
+  mapLoaded() {
+    this.heatMap();
 
-  mapInit() {
-    map = L.map('map', {
-      maxZoom: 22
-    }).setView(center, defaultzoom);
-
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: copytext
-    }).addTo(map);
-
-    // L.marker(center).addTo(map);
-    // var usercount = 5;
-    // var degreescale = d3.scaleLinear().domain([0, usercount]).range([0, 2 * Math.PI]);
-    // console.warn(map.getZoom(), defaultzoom)
-    // for(var i = 0; i <= usercount; i++) {
-    //   var userindex = i;
-
-    //   L.circleMarker([center[0]+ 0.001 * (Math.cos(degreescale(userindex)) - map.getZoom()/defaultzoom), center[1]+ 0.001 * (Math.sin(degreescale(userindex)) - map.getZoom() / defaultzoom)], {
-    //     fillOpacity: 0.5,
-    //     fillColor: '#f00',
-    //     radius: 10
-    //   }).addTo(map)
-    // }
-
-    map.on('zoom', debounce(this.mapEventHandler, debouncetime));
-    map.on('drag', debounce(this.mapEventHandler, debouncetime));
+    // map.on('zoom', debounce(this.mapEventHandler, debouncetime));
+    // map.on('drag', debounce(this.mapEventHandler, debouncetime));
   }
 
   mapEventHandler() {
@@ -84,11 +70,11 @@ class MainSection extends Component {
 
   heatMap() {
     this.props.getHeat(this.state.locationcount, (locationheats) => {
-      this.mapHeatMapUpdate(locationheats);
-      if(locationheats.length < heatPageSize) {
-        console.log('所有数据传输完成：', this.state.locationcount, locationheats.length);
-        return ;
-      }
+      // this.mapHeatMapUpdate(locationheats);
+      // if(locationheats.length < heatPageSize) {
+      //   console.log('所有数据传输完成：', this.state.locationcount, locationheats.length);
+      //   return ;
+      // }
       this.heatMap();
     });
   }
@@ -107,6 +93,10 @@ class MainSection extends Component {
     this.setState({
         locationcount: this.state.locationcount + latestedges.length
     })
+  }
+
+  iconClickHandler() {
+    console.warn(arguments)
   }
 
   getBoundLocationsData() {
@@ -219,19 +209,55 @@ class MainSection extends Component {
     }
   }
   
-
+  handleViewStateChange({viewState}) {
+    this.setState({
+      viewState: viewState
+    })
+  }
   render() {
     return <div className="map-section-wrapper">
-        <div id="map" ></div>
+        <div id="map" >
+            
+        <DeckGL
+          viewState={this.state.viewState}
+          onViewStateChange={this.handleViewStateChange.bind(this)}
+          controller={true}
+          layers={[
+            new IconLayer({
+              data: this.props.heatmapdata,
+              viewState: {
+                bearing: 0,
+                latitude: this.state.viewState.latitude,
+                longitude: this.state.viewState.longitude,
+                maxZoom: maxZoom,
+                minZoom: minZoom,
+                pitch: 0,
+                zoom: this.state.viewState.zoom
+              },
+              id: 'icon-layer',
+              showCluster: true,
+              onClick: this.iconClickHandler.bind(this)
+            })
+          ]}
+        >
+          <StaticMap
+              onLoad={this.mapLoaded.bind(this)}
+              mapStyle="mapbox://styles/mapbox/dark-v9"
+              preventStyleDiffing
+              mapboxApiAccessToken={MAPBOX_TOKEN}
+            />
+            </DeckGL>
+      </div>
       </div>
   }
 }
 
 function mapStateToProps(store) {
   return {
+    heatmapdata: store.heatmapdata,
     boundlocations: store.boundlocations,
     boundusers: store.boundusers,
-    checkins: store.checkins
+    checkins: store.checkins,
   }
 }
 

@@ -20,6 +20,7 @@
     "debounce": "^1.2.0",
     "deck.gl": "^6.4.5",
     "express": "^4.16.4",
+    "glmaps": "^0.0.1",
     "immutability-helper": "^3.0.0",
     "leaflet": "1.4.0",
     "leaflet-ant-path": "^1.2.1",

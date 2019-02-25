@@ -1,7 +1,8 @@
-import { GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from 'constants/actionTypes.js';
+import { GET_HEATMAP_SUCCESS, GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from 'constants/actionTypes.js';
 import update from 'immutability-helper';
 
 const INITIAL_STATE = {
+  heatmapdata: [],
   boundlocations: [],
   boundusers: [],
   checkins: [], 
@@ -9,6 +10,14 @@ const INITIAL_STATE = {
 
 export default function (state=INITIAL_STATE, action) {
   switch(action.type) {
+    case GET_HEATMAP_SUCCESS: {
+      state = update(state, {
+        heatmapdata: {
+          '$set': action.data
+        }
+      });
+      break;
+    }
     case GET_BOUND_LOCATIONS_SUCCESS: {
       state = update(state, {
         boundlocations: {

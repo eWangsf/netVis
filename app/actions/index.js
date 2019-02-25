@@ -1,6 +1,6 @@
 
 import api from '../api'
-import { GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from '../constants/actionTypes';
+import { GET_HEATMAP_SUCCESS, GET_BOUND_LOCATIONS_SUCCESS, GET_BOUND_USERS_SUCCESS, GET_LOCATION_CHECKINS } from '../constants/actionTypes';
 import { heatPageSize } from 'constants/mapconfig';
 import { mocklocations, mocklocationusers } from 'constants/test';
 
@@ -15,7 +15,18 @@ export const get_location_heat = (loctioncount, successCb=console.log, failCb=co
     })
     .then(res => {
       if(res && res.code === 200) {
-        successCb(res.data);
+        var result = res.data;
+        result = result.map(item => {
+          return {
+            coordinates: [item.lng, item.lat],
+            name: item.id,
+          }
+        })
+        dispatch({
+          type: GET_HEATMAP_SUCCESS,
+          data: result
+        })
+        // successCb(result);
       }
     })
   }
