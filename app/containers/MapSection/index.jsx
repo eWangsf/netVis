@@ -211,6 +211,7 @@ class MainSection extends Component {
     if(map.hasLayer(this.state.locationmarkersLayer)) {
       map.removeLayer(this.state.locationmarkersLayer)
     }
+    this.clearLocationUsers();
   }
   clearLocationUsers() {
     if(map.hasLayer(this.state.locationusersLayer)) {
