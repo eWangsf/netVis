@@ -7,6 +7,31 @@ import { mocklocations, mocklocationusers } from 'constants/test';
 var bound_seed = 0;
 var cancel_seed = null;
 
+export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.post('/checkin/bound', {
+      bounds
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        var result = res.data;
+        result = result.map(item => {
+          return {
+            coordinates: [+item.lng, +item.lat],
+            name: `checkin-${item.id}`,
+            lid: item.id,
+          }
+        })
+        dispatch({
+          type: GET_HEATMAP_SUCCESS,
+          data: result
+        })
+        successCb();
+      }
+    })
+  }
+}
+
 export const get_location_heat = (loctioncount, successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
     api.get('/location/heat', {
@@ -19,7 +44,8 @@ export const get_location_heat = (loctioncount, successCb=console.log, failCb=co
         result = result.map(item => {
           return {
             coordinates: [item.lng, item.lat],
-            name: item.id,
+            name: `checkin-${item.id}`,
+            checkinid: item.id,
           }
         })
         dispatch({

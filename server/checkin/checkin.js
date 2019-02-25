@@ -21,8 +21,9 @@ var jsonWrite = function (res, ret) {
 module.exports = {
   getInBound: function(req, res, next) {
     var params = req.body,
-        latrange = params.latrange,
-        lngrange = params.lngrange;
+        bounds = params.bounds,
+        latrange = bounds.latrange,
+        lngrange = bounds.lngrange;
 
     pool.getConnection(function(err, connection) {
       connection.query($sql.checkinByBound, [
@@ -72,7 +73,7 @@ module.exports = {
         })
         res.json({
           code: 200,
-          data: locationsmap
+          data: result
         })
         connection.release();
       })

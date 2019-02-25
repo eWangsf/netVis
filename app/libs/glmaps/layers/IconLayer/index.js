@@ -40,7 +40,7 @@ class IconMap extends CompositeLayer {
       iconMapping,
     };
 
-    const size = viewState ? viewState.zoom : 1;
+    const size = viewState ? Math.min(1.5**(viewState.zoom - 10), 1) : 0.1;
 
     const layer = showCluster
       ? new IconClusterLayer({

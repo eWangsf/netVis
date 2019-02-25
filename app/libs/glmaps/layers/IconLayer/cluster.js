@@ -121,7 +121,9 @@ export default class IconClusterLayer extends CompositeLayer {
               maxX: x + radius,
               maxY: y + radius,
             })
-            .filter(neighbor => neighbor.zoomLevels[z] === undefined);
+            .filter(neighbor => {
+              return neighbor.zoomLevels[z] === undefined;
+            });
 
           // only show the center point at this zoom level
           neighbors.forEach(neighbor => {

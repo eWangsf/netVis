@@ -9,21 +9,27 @@ let checkinfilepath = path.join(__dirname, '../data/checkin.txt')
 var checkin = require('../checkin/checkin.js');
 var location = require('../location/location.js');
 
-router.get('/location/heat', (req, res, next) => {
-		location.getLocationHeat(req, res, next);
-})
 
-router.post('/location/inboundlocations', (req, res, next) => {
-	location.getLocationInBound(req, res, next);
-})
-
-router.post('/location/inboundcheckins', (req, res, next) => {
+router.post('/checkin/bound',  (req, res, next) => {
 	checkin.getInBound(req, res, next);
 })
 
-router.get('/location/checkin', (req, res, next) => {
-	checkin.getByLocation(req, res, next);
-})
+
+// router.get('/location/heat', (req, res, next) => {
+// 		location.getLocationHeat(req, res, next);
+// })
+
+// router.post('/location/inboundlocations', (req, res, next) => {
+// 	location.getLocationInBound(req, res, next);
+// })
+
+// router.post('/location/inboundcheckins', (req, res, next) => {
+// 	checkin.getInBound(req, res, next);
+// })
+
+// router.get('/location/checkin', (req, res, next) => {
+// 	checkin.getByLocation(req, res, next);
+// })
 
 module.exports = router;
 
