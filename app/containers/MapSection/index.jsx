@@ -1,23 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import debounce from 'debounce';
-import L from 'leaflet';
-import {} from 'libs/leaflet-heat';
 import { StaticMap } from 'react-map-gl';
 import { IconLayer, ArcLayer } from 'libs/glmaps';
-import DeckGL, { MapController } from 'deck.gl';
-import * as d3 from "d3";
-import { AntPath, antPath } from 'leaflet-ant-path';
+import DeckGL from 'deck.gl';
 
-import { get_heat_in_bound, get_checkin_group_detail, get_location_heat, get_locations_in_bound, get_location_checkins_in_bound, get_location_detail } from 'actions';
-import { center, defaultzoom, maxZoom, minZoom, copytext, heatPageSize, MAPBOX_TOKEN } from 'constants/mapconfig';
+import { get_heat_in_bound, get_checkin_group_detail } from 'actions';
+import { center, defaultzoom, maxZoom, minZoom, MAPBOX_TOKEN } from 'constants/mapconfig';
 import './index.scss';
 
-var map = null;
-var heat = null;
-var triggerBoundDataZoom = 12;
-var triggerLocationDetailRenderZoom = 17;
-var triggerLocationUsersRenderZoom = 18;
 var debouncetime = 400;
 
 var warn = (msg) => {
@@ -70,6 +61,7 @@ class MainSection extends Component {
   handleViewStateChange({ viewState }) {
     const mapGL = this.map.getMap();
     const bounds = mapGL.getBounds();
+    console.warn(viewState)
     this.setState({
       viewState: viewState,
       bounds: {
