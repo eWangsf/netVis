@@ -1,6 +1,9 @@
 
 import api from '../api'
-import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS } from '../constants/actionTypes';
+import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS,
+  GET_HOTSPOTS_SUCCESS,
+  GET_LOCATION_CHECKINS
+  } from '../constants/actionTypes';
 
 var bound_seed = 0;
 var cancel_seed = null;
@@ -73,6 +76,44 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
         })
       } else {
         console.warn(res.data);
+      }
+    })
+  }
+}
+
+export const get_hotspots = (successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.get('location/hotspots')
+      .then(res => {
+        if(res && res.code === 200) {
+          dispatch({
+            type: GET_HOTSPOTS_SUCCESS,
+            data: res.data
+          })
+          successCb(res.data);
+        }
+      })
+  }
+}
+
+export const get_checkins_by_lid = (lid, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.get('/checkin/bylid', {
+      lid
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        var checkins = res.data;
+
+        checkins = checkins.sort((c1, c2) => {
+          return c1.time > c2.time ? 1 : -1;
+        });
+        dispatch({
+          type: GET_LOCATION_CHECKINS,
+          data: checkins
+        })
+        // successCb([checkins[0].time, checkins[checkins.length - 1].time])
+        successCb()
       }
     })
   }

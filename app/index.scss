@@ -8,6 +8,7 @@
 
 html, body, .layout, .main-section, .append-section {
   height: 100%;
+  overflow: auto;
 }
 
 .layout {

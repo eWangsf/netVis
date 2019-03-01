@@ -82,6 +82,7 @@ module.exports = {
   },
   getByLocation: function(req, res, next) {
     var lid = +req.query.lid;
+
     pool.getConnection(function(err, connection) {
       connection.query($sql.checkinByLocationId, [lid], function (err, result) {
         if(typeof result === 'undefined') {
@@ -92,6 +93,13 @@ module.exports = {
           connection.release();
           return ;
         }
+        result = result.map(item => {
+          item.lat = +item.lat;
+          item.lng = +item.lng;
+          item.time = +item.time;
+          
+          return item;
+        })
         res.json({
           code: 200,
           data: result,
@@ -100,5 +108,5 @@ module.exports = {
         connection.release();
       });     
     });
-  }
+  },
 }

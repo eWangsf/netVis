@@ -71,5 +71,28 @@ module.exports = {
     });
 
     
+  },
+
+  getHotspots: function(req, res, next) {
+
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.getHotspots, function (err, result) {
+        if(typeof result === 'undefined') {
+          res.json({
+            code: 1,
+            msg: '获取热点信息失败'
+          })
+          connection.release();
+          return ;
+        }
+        res.json({
+          code: 200,
+          data: result
+        })
+      });
+    });
+    
+
+
   }
 }

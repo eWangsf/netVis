@@ -19,6 +19,15 @@ router.post('/edges/users', (req, res, next) => {
 	edge.getEdgesByOneSide(req, res, next);
 })
 
+router.get('/location/hotspots', (req, res, next) => {
+	location.getHotspots(req, res, next);
+})
+
+router.get('/checkin/bylid', (req, res, next) => {
+	checkin.getByLocation(req, res, next)
+})
+
+
 
 // router.get('/location/heat', (req, res, next) => {
 // 		location.getLocationHeat(req, res, next);

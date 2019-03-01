@@ -1,4 +1,6 @@
-import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS } from 'constants/actionTypes.js';
+import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS,
+  GET_HOTSPOTS_SUCCESS, GET_LOCATION_CHECKINS
+} from 'constants/actionTypes.js';
 import update from 'immutability-helper';
 
 const INITIAL_STATE = {
@@ -7,6 +9,11 @@ const INITIAL_STATE = {
   uids: [],
   lids: [],
   edges: [],
+
+  hotspots: [],
+  checkins: [], 
+
+
   // edges: [
   //   {
   //     source: [-74.34921704225347, 40.73014929577467, 0],
@@ -15,7 +22,6 @@ const INITIAL_STATE = {
   //   }],
   // boundlocations: [],
   // boundusers: [],
-  // checkins: [], 
 }
 
 export default function (state=INITIAL_STATE, action) {
@@ -50,6 +56,23 @@ export default function (state=INITIAL_STATE, action) {
       });
       break;
     }
+
+    case GET_HOTSPOTS_SUCCESS: {
+      state = update(state, {
+        hotspots: {
+          '$set': action.data
+        }
+      })
+    }
+    case GET_LOCATION_CHECKINS: {
+      
+      state = update(state, {
+        checkins: {
+          '$set': action.data
+        }
+      });
+      break;
+    }
     // case GET_BOUND_LOCATIONS_SUCCESS: {
     //   state = update(state, {
     //     boundlocations: {
@@ -66,14 +89,7 @@ export default function (state=INITIAL_STATE, action) {
     //   });
     //   break;
     // }
-    // case GET_LOCATION_CHECKINS: {
-    //   state = update(state, {
-    //     checkins: {
-    //       '$set': action.data
-    //     }
-    //   });
-    //   break;
-    // }
+    
     default: 
       return state;
   }
