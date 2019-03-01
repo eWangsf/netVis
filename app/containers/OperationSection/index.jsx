@@ -41,44 +41,26 @@ class OperationSection extends Component {
 
 
     this.props.getCheckinByLocation(spot.id, (timerange) => {
-      var usermap = {
-      };
-      this.props.checkins.forEach((item) => {
-        var uid = +item.uid;
-        if(!usermap[uid]) {
-          usermap[uid] = 0;
-        }
-        usermap[uid] ++;
-      })
 
-      var userids = Object.keys(usermap);
+      // var svg = d3.select('.checkin-svg')
 
-      var entries = userids.map((uid, index) => {
-        return {
-          uid: +uid,
-          count: usermap[uid]
-        }
-      })
+      // var rectsgroup = svg.append('g')
+      //       .attr("class", "rectsgroup");
 
-      var svg = d3.select('.checkin-svg')
-
-      var rectsgroup = svg.append('g')
-            .attr("class", "rectsgroup");
-
-      rectsgroup.selectAll('.userall')
-        .data(entries)
-        .enter()
-        .append('rect')
-        .attr('class', `checkinitem checkin-in-${spot.id}`)
-        .attr('x', function(d) {
-          return 0;
-        })
-        .attr('y', function(d, i) {
-          return i * 20;
-        })
-        .attr('width', function(d) {
-          return d.count * 2;
-        })
+      // rectsgroup.selectAll('.userall')
+      //   .data(entries)
+      //   .enter()
+      //   .append('rect')
+      //   .attr('class', `checkinitem checkin-in-${spot.id}`)
+      //   .attr('x', function(d) {
+      //     return 0;
+      //   })
+      //   .attr('y', function(d, i) {
+      //     return i * 20;
+      //   })
+      //   .attr('width', function(d) {
+      //     return d.count * 2;
+      //   })
 
 
       // var domEl = 'hotspots-content';
@@ -90,11 +72,11 @@ class OperationSection extends Component {
 
 
   render() {
-
+    
     return <div className="operation-section-wrapper">
 
             <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
-                <div className="spot-list">
+                <div className="section-content spot-list">
 
                   {
                     this.props.hotspots && this.props.hotspots.length > 0 && this.state.hotscale ? this.props.hotspots.map(item => {
@@ -122,26 +104,57 @@ class OperationSection extends Component {
                 <p>edges: {this.props.edges.length}</p>
                 <p>checkins: {this.props.checkins.length}</p>
               </div>
-
             </div>
 
             <div className="section hotspots-section">
               <div className="section-title">hotspots</div>
-              <div className="hotspots-content">
-                <svg id="checkin-svg" className="checkin-svg"></svg>
+              <div className="section-content hotspots-content">
+                <svg id="checkin-svg" className="checkin-svg">
+                  <g className="rectsgroup">
+                      {
+                        this.props.checkinsByuid && this.props.checkinsByuid.length ? this.props.checkinsByuid.map((citem, cindex) => {
+                          return <rect key={citem.id || cindex} className={`checkinitem checkin-in-${citem.id}`} x="0" y={cindex * 20} width={citem.count * 2} height="18"></rect>
+                        }) : null
+                      }
+                  </g>
+                </svg>
               </div>
             </div>
 
-            <div className="section record-section">
+            {/* <div className="section record-section">
               <div className="section-title">record</div>
-
-            </div>
+              
+            </div> */}
 
       </div>
   }
 }
 
 function mapStateToProps(store) {
+  var usermap = {
+  };
+  if(store.checkins.length > 0) {
+    store.checkins.forEach((item) => {
+      var uid = +item.uid;
+      if(!usermap[uid]) {
+        usermap[uid] = 0;
+      }
+      usermap[uid] ++;
+    })
+  }
+
+  var userids = Object.keys(usermap);
+
+  var entries = userids.map((uid, index) => {
+    return {
+      uid: +uid,
+      count: usermap[uid]
+    }
+  })
+
+  console.warn(userids, usermap, store.checkins)
+
+
   return {
     lids: store.lids,
     uids: store.uids,
@@ -149,7 +162,8 @@ function mapStateToProps(store) {
     edges: store.edges,
 
     hotspots: store.hotspots,
-    checkins: store.checkins
+    checkins: store.checkins,
+    checkinsByuid: entries
   }
 }
 

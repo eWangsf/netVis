@@ -27,9 +27,11 @@ export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.
         var result = res.data;
         result = result.map(item => {
           return {
-            coordinates: [+item.lng, +item.lat],
             name: `checkin-${item.id}`,
-            lid: item.id,
+            coordinates: [+item.lng, +item.lat],
+            lat: +item.lat,
+            lng: +item.lng,
+            lid: item.lid,
             uid: item.uid,
             time: item.time
           }
@@ -83,7 +85,7 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
 
 export const get_hotspots = (successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
-    api.get('location/hotspots')
+    api.get('/location/hotspots')
       .then(res => {
         if(res && res.code === 200) {
           dispatch({

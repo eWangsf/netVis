@@ -35,8 +35,9 @@ export default function (state=INITIAL_STATE, action) {
       break;
     }
     case SAVE_CHECKIN_GROUPS: {
+      console.warn(action.data);
       state = update(state, {
-        checkingroups: {
+        checkins: {
           '$set': action.data
         },
         uids: {
@@ -62,7 +63,8 @@ export default function (state=INITIAL_STATE, action) {
         hotspots: {
           '$set': action.data
         }
-      })
+      });
+      break;
     }
     case GET_LOCATION_CHECKINS: {
       
