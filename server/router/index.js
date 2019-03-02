@@ -15,8 +15,34 @@ router.post('/checkin/bound',  (req, res, next) => {
 	checkin.getInBound(req, res, next);
 })
 
-router.post('/edges/users', (req, res, next) => {
-	edge.getEdgesByOneSide(req, res, next);
+// router.post('/edges/users', (req, res, next) => {
+// 	edge.getEdgesByOneSide(req, res, next);
+// })
+
+router.post('/checkin/total/users', (req, res, next) => {
+	var params = req.body,
+		uids = params.uids;
+
+	var promises = uids.map(item => {
+		return new Promise((resolve, reject) => {
+			checkin.getCheckinTotal(item, resolve, reject);
+		})
+	})
+
+		Promise.all(promises)
+		.then(allcount => {
+			res.json({
+				code: 200,
+				data: allcount
+			})
+		})
+		.catch(err => {
+			res.json({
+				code: 1,
+				msg: err
+			})
+			console.log(err)
+		})
 })
 
 router.get('/location/hotspots', (req, res, next) => {

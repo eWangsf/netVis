@@ -159,9 +159,6 @@ function mapStateToProps(store) {
   return {
     heatmapdata: store.heatmapdata,
     edges: store.edges,
-    boundlocations: store.boundlocations,
-    boundusers: store.boundusers,
-    checkins: store.checkins,
   }
 }
 

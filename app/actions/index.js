@@ -1,6 +1,6 @@
 
 import api from '../api'
-import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS,
+import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_USERS_CHECKIN_TOTAL_SUCCESS,
   GET_HOTSPOTS_SUCCESS,
   GET_LOCATION_CHECKINS
   } from '../constants/actionTypes';
@@ -57,23 +57,51 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
     var lmap = {};
     var umap = {};
     checkins.forEach(item => {
-      lmap[item.lid] = 1;
-      umap[item.uid] = 1;
+      if(!lmap[item.lid]) {
+        lmap[item.lid] = {
+          count: 0,
+          users: [],
+        }
+      }
+      if(!umap[item.uid]) {
+        umap[item.uid] = {
+          count: 0,
+          checkins: []
+        }
+      }
+      lmap[item.lid].count ++;
+      if(!lmap[item.lid].users.includes(item.uid)) {
+        lmap[item.lid].users.push(+item.uid);
+      }
+      umap[item.uid].count ++;
+      umap[item.uid].checkins.push(item);
     });
 
     dispatch({
       type: SAVE_CHECKIN_GROUPS,
-      data: checkins,
-      uids: Object.keys(umap),
-      lids: Object.keys(lmap)
+      checkins: checkins,
+      locationtree: Object.keys(lmap).map(item => {
+        return {
+          lid: +item,
+          count: lmap[item].count,
+          users: lmap[item].users,
+        }
+      }),
+      usertree: Object.keys(umap).map(item => {
+        return {
+          uid: +item,
+          count: umap[item].count,
+          checkins: umap[item].checkins
+        }
+      })
     })
-    var edgespromise = api.post('/edges/users', {
+    api.post('/checkin/total/users', {
       uids: Object.keys(umap)
     })
     .then(res => {
       if(res && res.data && (res.data instanceof Array)) {
         dispatch({
-          type: GET_EDGES_SUCCESS,
+          type: GET_USERS_CHECKIN_TOTAL_SUCCESS,
           data: res.data
         })
       } else {

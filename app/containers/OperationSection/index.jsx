@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { get_hotspots, get_checkins_by_lid } from 'actions';
 
 import * as d3 from 'd3';
-// import timeseries from 'libs/timeseries/timeseries';
 
 import './index.scss';
 import 'libs/timeseries/style.css';
@@ -42,31 +41,6 @@ class OperationSection extends Component {
 
     this.props.getCheckinByLocation(spot.id, (timerange) => {
 
-      // var svg = d3.select('.checkin-svg')
-
-      // var rectsgroup = svg.append('g')
-      //       .attr("class", "rectsgroup");
-
-      // rectsgroup.selectAll('.userall')
-      //   .data(entries)
-      //   .enter()
-      //   .append('rect')
-      //   .attr('class', `checkinitem checkin-in-${spot.id}`)
-      //   .attr('x', function(d) {
-      //     return 0;
-      //   })
-      //   .attr('y', function(d, i) {
-      //     return i * 20;
-      //   })
-      //   .attr('width', function(d) {
-      //     return d.count * 2;
-      //   })
-
-
-      // var domEl = 'hotspots-content';
-      // var data = [{'value': 1380854103662},{'value': 1363641921283}];
-      // var brushEnabled = true;
-      // timeseries(domEl, data, brushEnabled);
     })
   }
 
@@ -75,7 +49,7 @@ class OperationSection extends Component {
     
     return <div className="operation-section-wrapper">
 
-            <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
+            {/* <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
                 <div className="section-content spot-list">
 
                   {
@@ -92,15 +66,12 @@ class OperationSection extends Component {
 
                 </div>
                 <div className="section-icon" onClick={this.toggleUnsualSection.bind(this)}></div>
-            </div>
+            </div> */}
     
             <div className="section clusters-section">
               <div className="section-title">clusters</div>
               <div className="section-content">
                 <p>hotspots: {this.props.hotspots.length}</p>
-                <p>checkingroups: {this.props.checkingroups.length}</p>
-                <p>uids: {this.props.uids.length}</p>
-                <p>lids: {this.props.lids.length}</p>
                 <p>edges: {this.props.edges.length}</p>
                 <p>checkins: {this.props.checkins.length}</p>
               </div>
@@ -131,39 +102,36 @@ class OperationSection extends Component {
 }
 
 function mapStateToProps(store) {
-  var usermap = {
-  };
-  if(store.checkins.length > 0) {
-    store.checkins.forEach((item) => {
-      var uid = +item.uid;
-      if(!usermap[uid]) {
-        usermap[uid] = 0;
-      }
-      usermap[uid] ++;
-    })
-  }
+  // var usermap = {
+  // };
+  // if(store.checkins.length > 0) {
+  //   store.checkins.forEach((item) => {
+  //     var uid = +item.uid;
+  //     if(!usermap[uid]) {
+  //       usermap[uid] = 0;
+  //     }
+  //     usermap[uid] ++;
+  //   })
+  // }
 
-  var userids = Object.keys(usermap);
+  // var userids = Object.keys(usermap);
 
-  var entries = userids.map((uid, index) => {
-    return {
-      uid: +uid,
-      count: usermap[uid]
-    }
-  })
+  // var entries = userids.map((uid, index) => {
+  //   return {
+  //     uid: +uid,
+  //     count: usermap[uid]
+  //   }
+  // })
 
-  console.warn(userids, usermap, store.checkins)
-
+  // console.warn(userids, usermap, store.checkins)
 
   return {
-    lids: store.lids,
-    uids: store.uids,
-    checkingroups: store.checkingroups,
     edges: store.edges,
-
     hotspots: store.hotspots,
     checkins: store.checkins,
-    checkinsByuid: entries
+    locationtree: store.locationtree,
+    usertree: store.usertree,
+    // checkinsByuid: entries
   }
 }
 

@@ -1,15 +1,13 @@
-import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS,
+import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_USERS_CHECKIN_TOTAL_SUCCESS,
   GET_HOTSPOTS_SUCCESS, GET_LOCATION_CHECKINS
 } from 'constants/actionTypes.js';
 import update from 'immutability-helper';
 
 const INITIAL_STATE = {
   heatmapdata: [],
-  checkingroups: [],
-  uids: [],
-  lids: [],
+  locationtree: [],
+  usertree: [],
   edges: [],
-
   hotspots: [],
   checkins: [], 
 
@@ -35,24 +33,30 @@ export default function (state=INITIAL_STATE, action) {
       break;
     }
     case SAVE_CHECKIN_GROUPS: {
-      console.warn(action.data);
       state = update(state, {
         checkins: {
-          '$set': action.data
+          '$set': action.checkins
         },
-        uids: {
-          '$set': action.uids
+        locationtree: {
+          '$set': action.locationtree
         },
-        lids: {
-          '$set': action.lids
+        usertree: {
+          '$set': action.usertree
         }
       });
       break;
     }
-    case GET_EDGES_SUCCESS: {
+    case GET_USERS_CHECKIN_TOTAL_SUCCESS: {
+      var usertree = state.usertree;
+      var totalcounts = action.data;
+
+      usertree.forEach(uitem => {
+        var countitem = totalcounts.find(item => +item.uid === +uitem.uid);
+        uitem.total = countitem.count;
+      });
       state = update(state, {
-        edges: {
-          '$set': action.data
+        usertree: {
+          '$set': usertree
         }
       });
       break;

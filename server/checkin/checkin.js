@@ -109,4 +109,21 @@ module.exports = {
       });     
     });
   },
+  getCheckinTotal: function(uid, resolve, reject) {
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.checkinTotalByuid, [uid], function (err, result) {
+        if(typeof result === 'undefined') {
+          reject(err);
+          connection.release();
+          return ;
+        }
+
+        resolve({
+          uid,
+          count: result[0].count
+        });
+        connection.release();
+      });
+    });
+  }
 }
