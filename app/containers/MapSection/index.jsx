@@ -55,7 +55,7 @@ class MainSection extends Component {
         lngrange: [bounds.getWest(), bounds.getEast()]
       }
     })
-    // this.heatMap();
+    this.heatMap();
   }
 
   handleViewStateChange({ viewState }) {
@@ -69,7 +69,7 @@ class MainSection extends Component {
         lngrange: [bounds.getWest(), bounds.getEast()]
       }
     })
-    // this.heatMap();
+    this.heatMap();
   }
 
   heatMap() {

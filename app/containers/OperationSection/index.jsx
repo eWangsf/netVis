@@ -17,7 +17,7 @@ class OperationSection extends Component {
     super(props);
 
     this.state = {
-      unsualshow: true,
+      unsualshow: false,
       hotscale: null,
       activeLocation: {},
       activeLocationIndex: -1,
@@ -85,7 +85,7 @@ class OperationSection extends Component {
 
   render() {
 
-    var { locationtree, activeLocation, activeLocationIndex } = this.state;
+    var { locationtree, usertree, activeLocation, activeLocationIndex } = this.state;
 
     var nTop = this.props.locationtree.length;
 
@@ -93,7 +93,10 @@ class OperationSection extends Component {
     var bubblemarginratio = 0.25;
     var bubblemarginOuterratio = 0.5;
 
-    var everypercent = (bubblesvgwidth - margin.left - margin.right - (activeLocationIndex > -1 ? 20 : 0)) / ((2*radiusradio+2+bubblemarginratio+bubblemarginOuterratio)*nTop);
+    var everypercent = (bubblesvgwidth - margin.left - margin.right - (activeLocationIndex > -1 ? 40 : 0)) / ((2*radiusradio+2+bubblemarginratio+bubblemarginOuterratio)*nTop);
+    everypercent = Math.min(everypercent, 
+    (bubblesvgheight - margin.top - margin.bottom) / (2*radiusradio+4+2*bubblemarginratio)
+    )
     childcircleconfig.radius = everypercent;
     topcircleconfig.radius = radiusradio*everypercent;
     topcircleconfig.bubblemargin = bubblemarginratio*everypercent;
@@ -110,7 +113,7 @@ class OperationSection extends Component {
     
     return <div className="operation-section-wrapper">
 
-            {/* <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
+            <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
                 <div className="section-content spot-list">
 
                   {
@@ -127,7 +130,7 @@ class OperationSection extends Component {
 
                 </div>
                 <div className="section-icon" onClick={this.toggleUnsualSection.bind(this)}></div>
-            </div> */}
+            </div>
     
             <div className="section clusters-section">
               <div className="section-title">clusters</div>
@@ -141,7 +144,7 @@ class OperationSection extends Component {
                           var cx = xscale(lindex), 
                               cy = 0.5 * bubblesvgheight,
                               r = active ? (topcircleconfig.hoverRadius) : (topcircleconfig.radius);
-                          var movestep = (2*topcircleconfig.hoverRadius - 2*topcircleconfig.radius) / (nTop - 1);
+                          var movestep = (2*topcircleconfig.hoverRadius - 2*topcircleconfig.radius) / (nTop);
                           if(hasActive && activeLocationIndex > lindex) {
                             cx -= movestep;
                           }
@@ -201,8 +204,12 @@ class OperationSection extends Component {
                         secondbubbles.map((uitem, index) => {
                           var r = childcircleconfig.radius,
                               inner_r = r - 2,
-                              active = uitem.active;
-
+                              bubble_r = r - 4,
+                              active = uitem.active,
+                              userinfo = usertree.find(item => +item.uid === +uitem.uid),
+                              percent = userinfo && userinfo.total ? +userinfo.count / +userinfo.total : '',
+                              degree = [Math.asin(1-2*percent), Math.PI - Math.asin(1-2*percent)];
+  
                           return <g key={index} 
                             className={`childBubbleAndText childBubbleAndText${uitem.uid}`}
                             transform={`translate(${uitem.x},${uitem.y})`}
@@ -224,12 +231,21 @@ class OperationSection extends Component {
                               style={{
                                   'fill': 'rgb(23, 139, 202)'
                                 }}>
-                              </path>
+                            </path>
+
+                            {
+                              percent ? <path d={`M${bubble_r*Math.cos(degree[1])},${bubble_r*Math.sin(degree[1])}A${bubble_r},${bubble_r} 0 0 0 0 ${bubble_r}A${bubble_r},${bubble_r} 0 0 0 ${bubble_r*Math.cos(degree[0])} ${bubble_r*Math.sin(degree[0])}Z`} 
+                                className={`childBubbleInnerPath childBubbleInnerPath${uitem.uid}`} 
+                                style={{
+                                    'fill': 'rgb(23, 139, 202)'
+                                  }}>
+                              </path> : null
+                            }
                               
                             
                             <text className={`childBubbleText childBubbleText${uitem.uid}`} 
                                 x={0} 
-                                y={0} 
+                                y={percent < 0.25 || percent > 0.75 ? 0 : childcircleconfig.radius + 5} 
                                 textAnchor="middle" 
                                 fontSize={active ? childtextconfig.hoverFontSize : childtextconfig.fontSize} 
                                 cursor="pointer" 
@@ -237,7 +253,7 @@ class OperationSection extends Component {
                                 alignmentBaseline="middle" 
                                 style={{
                                   'opacity': active ? childtextconfig.hoverOpacity : childtextconfig.opacity,
-                                  'fill': 'rgb(31, 119, 180)'
+                                  'fill': percent < 0.25 ? 'rgb(31, 119, 180)' : (percent > 0.75 ?  '#fff' : '#333')
                                 }}>
                                 {uitem.uid}
                             </text>
@@ -252,7 +268,7 @@ class OperationSection extends Component {
             </div>
 
             <div className="section hotspots-section">
-              <div className="section-title">hotspots</div>
+              <div className="section-title">checkinsbyuid</div>
               <div className="section-content hotspots-content">
                 <svg id="checkin-svg" className="checkin-svg">
                   <g className="rectsgroup">
@@ -309,13 +325,43 @@ function mapStateToProps(store) {
     "lid":3937313,"count":1,"users":[112956]
   }];
 
-  var testusertree=[{"uid":18512,"count":1,"checkins":"[{\"name\":\"checkin-2078158\",\"coordinates\":\"[-74.121740967,40.6710719]\",\"lat\":40.6710719,\"lng\":-74.121740967,\"lid\":3453809,\"uid\":18512,\"time\":\"1284138600000\",\"x\":373.82685215462817,\"y\":208.55098537743356,\"zoomLevels\":\"\"}]"},{"uid":33817,"count":1,"checkins":"[{\"name\":\"checkin-2820832\",\"coordinates\":\"[-74.1116481,40.6679821]\",\"lat\":40.6679821,\"lng\":-74.1116481,\"lid\":771946,\"uid\":33817,\"time\":\"1271192913000\",\"x\":373.8412063771566,\"y\":208.55642997839166,\"zoomLevels\":\"\"}]"},{"uid":34311,"count":1,"checkins":"[{\"name\":\"checkin-2851287\",\"coordinates\":\"[-74.10765868,40.67343455]\",\"lat\":40.67343455,\"lng\":-74.10765868,\"lid\":1426192,\"uid\":34311,\"time\":\"1278881302000\",\"x\":373.84688126127,\"y\":208.54682195570052,\"zoomLevels\":\"\"}]"},{"uid":51647,"count":1,"checkins":"[{\"name\":\"checkin-3586281\",\"coordinates\":\"[-74.1116481,40.6679821]\",\"lat\":40.6679821,\"lng\":-74.1116481,\"lid\":771946,\"uid\":51647,\"time\":\"1269285680000\",\"x\":373.8412063771566,\"y\":208.55642997839166,\"zoomLevels\":\"\"}]"},{"uid":112956,"count":1,"checkins":"[{\"name\":\"checkin-5107287\",\"coordinates\":\"[-74.099024838,40.670383532]\",\"lat\":40.670383532,\"lng\":-74.099024838,\"lid\":3937313,\"uid\":112956,\"time\":\"1284780671000\",\"x\":373.8591603971751,\"y\":208.55219838388362,\"zoomLevels\":\"\"}]"}];
-  testusertree.forEach(item => {
-    item.checkins = JSON.parse(item.checkins);
-    item.checkins.forEach(citem => {
-      citem.coordinates = JSON.parse(citem.coordinates);
-    })
-  })
+  var testusertree=[{
+    "uid":18512,
+    "count":1,
+    "total": 346,
+    "checkins": [
+      {"name":"checkin-2078158","coordinates":[-74.121740967,40.6710719],"lat":40.6710719,"lng":-74.121740967,"lid":3453809,"uid":18512,"time":"1284138600000","x":373.82685215462817,"y":208.55098537743356,"zoomLevels":""}
+    ]
+  },{
+    "uid":33817,
+    "count":1,
+    "total": 225,
+    "checkins":[
+      {"name":"checkin-2820832","coordinates":[-74.1116481,40.6679821],"lat":40.6679821,"lng":-74.1116481,"lid":771946,"uid":33817,"time":"1271192913000","x":373.8412063771566,"y":208.55642997839166,"zoomLevels":""}
+    ]
+  },{
+    "uid":34311,
+    "count":1,
+    "total": 223,
+    "checkins":
+    [
+      {"name":"checkin-2851287","coordinates":[-74.10765868,40.67343455],"lat":40.67343455,"lng":-74.10765868,"lid":1426192,"uid":34311,"time":"1278881302000","x":373.84688126127,"y":208.54682195570052,"zoomLevels":""}
+    ]
+    },{
+      "uid":51647,
+      "count":1,
+      "total": 47,
+      "checkins":[
+        {"name":"checkin-3586281","coordinates":[-74.1116481,40.6679821],"lat":40.6679821,"lng":-74.1116481,"lid":771946,"uid":51647,"time":"1269285680000","x":373.8412063771566,"y":208.55642997839166,"zoomLevels":""}
+    ]
+    },{
+      "uid":112956,
+      "count":1,
+      "total": 2, //299
+      "checkins":[
+        {"name":"checkin-5107287","coordinates":[-74.099024838,40.670383532],"lat":40.670383532,"lng":-74.099024838,"lid":3937313,"uid":112956,"time":"1284780671000","x":373.8591603971751,"y":208.55219838388362,"zoomLevels":""}
+      ]
+    }];
   return {
     edges: store.edges,
     hotspots: store.hotspots,
