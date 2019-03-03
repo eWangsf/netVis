@@ -61,7 +61,7 @@ class MainSection extends Component {
   handleViewStateChange({ viewState }) {
     const mapGL = this.map.getMap();
     const bounds = mapGL.getBounds();
-    console.warn(viewState)
+    // console.warn(viewState)
     this.setState({
       viewState: viewState,
       bounds: {
