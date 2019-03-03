@@ -9,16 +9,24 @@ export const margin = {
   right: 20
 };
 
-export const movestep = 10;
 
 export const topcircleconfig = {
     opacity: 0.3,
-    bubblemargin: 20
-}
-export const childcircleconfig = {
-
 }
 
 export const toptextconfig = {
-  fontSize: 14
+  fontSize: 14,
+  hoverFontSize: 16
 }
+
+export const childcircleconfig = {
+}
+
+export const childtextconfig = {
+  fontSize: 6,
+  opacity: 0.7,
+  hoverFontSize: 7,
+  hoverOpacity: 1
+}
+
+

@@ -87,6 +87,13 @@
       .topBubble {
         transition: r 0.5s, cx 0.5s;
       }
+      .childBubbleAndText {
+        transition: transform 0.5s;
+      }
+
+      .topBubbleText, .childBubbleText {
+        transition: font-size 0.2s, opacity 0.2s;
+      }
       
     }
   }
