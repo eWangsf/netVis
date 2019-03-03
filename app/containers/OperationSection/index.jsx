@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { get_hotspots, get_checkins_by_lid } from 'actions';
 
+import { bubblesvgwidth, bubblesvgheight, margin, movestep, 
+  topcircleconfig, toptextconfig 
+} from 'constants/bubblesvgconfig';
+
 import * as d3 from 'd3';
 
 import './index.scss';
@@ -14,7 +18,9 @@ class OperationSection extends Component {
 
     this.state = {
       unsualshow: true,
-      hotscale: null
+      hotscale: null,
+      activeLocation: {},
+      activeLocationIndex: -1,
     }
   } 
 
@@ -25,6 +31,14 @@ class OperationSection extends Component {
         hotscale: d3.scaleLinear().domain([Math.min(...weights), Math.max(...weights)]).range([0.3, 1])
       })
     })
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    return {
+      ...state,
+      locationtree: props.locationtree.map(item => +item.lid === +state.activeLocation.lid ? {...item, active: true} : item),
+      usertree: props.usertree,
+    }
   }
 
   toggleUnsualSection() {
@@ -44,32 +58,39 @@ class OperationSection extends Component {
     })
   }
 
+  activateBubble(location, index) {
+    this.setState({
+      activeLocation: location,
+      activeLocationIndex: index
+    })
+  }
+  resetBubble(location, index) {
+    this.setState({
+      activeLocation: {},
+      activeLocationIndex: -1,
+      locationtree: this.state.locationtree.map(item => {
+        return { ...item, active: false }
+      })
+    })
+  }
+
 
   render() {
 
-    var width = 470,
-        height = 220,
-        nTop = this.props.locationtree.length;
-    var margin = {
-      top: 20,
-      bottom: 20,
-      left: 20,
-      right: 20
-    }
+    var { locationtree, activeLocation, activeLocationIndex } = this.state;
+
+    var nTop = this.props.locationtree.length;
     
-    var oR = Math.min((height-margin.top-margin.bottom) / 2, (width - margin.left - margin.right)/(2*nTop));
+    var oR = Math.min((bubblesvgheight-margin.top-margin.bottom) / 2, (bubblesvgwidth - margin.left - margin.right)/(2*nTop));
 
-    var xscale = d3.scaleLinear().domain([0, nTop-1]).range([margin.left + oR, width - margin.right - oR]);
-
-    var colors = [];
+    var xscale = d3.scaleLinear().domain([0, nTop-1]).range([margin.left + oR, bubblesvgwidth - margin.right - oR]),
+        colors = [];
 
     for(var i = 0; i < Math.ceil(nTop/10); i++) {
       colors = colors.concat(d3.schemeCategory10);
     }
 
     var secondbubbles = [];
-
-
     
     return <div className="operation-section-wrapper">
 
@@ -97,32 +118,53 @@ class OperationSection extends Component {
               <div className="section-content">
                   <svg id="bubblesvg" className="bubblesvg">
                       {
-                        this.props.locationtree && this.props.locationtree.length > 0 ? this.props.locationtree.map((locationitem, lindex) => {
+                        locationtree && locationtree.length > 0 ? locationtree.map((locationitem, lindex) => {
                           var dscale = d3.scaleLinear().domain([0, locationitem.users.length -1]).range([-0.25*Math.PI, 0.25*Math.PI]);
-                          var _sarr = locationitem.users.map((userid, uindex) => {
-                            return {
-                              lid: locationitem.lid,
-                              uid: +userid,
-                              r: 10,
-                              x: xscale(lindex) + (oR) * Math.cos(dscale(uindex)),
-                              y: height * 0.5 - (oR) * Math.sin(dscale(uindex))
-                            }
-                          })
-                          secondbubbles = secondbubbles.concat(_sarr);
-                          return <g className={`topBubbleAndText_${locationitem.lid}`} key={locationitem.lid || lindex}>
+                          // var _sarr = locationitem.users.map((userid, uindex) => {
+                          //   return {
+                          //     lid: locationitem.lid,
+                          //     uid: +userid,
+                          //     r: 10,
+                          //     x: xscale(lindex) + (oR) * Math.cos(dscale(uindex)),
+                          //     y: height * 0.5 - (oR) * Math.sin(dscale(uindex))
+                          //   }
+                          // })
+                          // secondbubbles = secondbubbles.concat(_sarr);
+                          var hasActive = activeLocationIndex >= 0;
+                          var active = +activeLocation.lid === +locationitem.lid;
+
+                          var cx = xscale(lindex),
+                              cy = 0.5 * bubblesvgheight,
+                              r = active ? oR : (oR - topcircleconfig.bubblemargin);
+                          if(hasActive && activeLocationIndex > lindex) {
+                            cx -= movestep;
+                          }
+                          if(hasActive && activeLocationIndex < lindex) {
+                            cx += movestep;
+                          }
+
+                          return <g className={`topBubbleAndText topBubbleAndText_${locationitem.lid} ${active ? 'active' : ''}`} key={locationitem.lid || lindex}
+                                style={{
+                                  'transform': `translate3d(${cx}px, ${cy}px, 0)`
+                                }}
+                                onMouseOver={this.activateBubble.bind(this, locationitem, lindex)} 
+                                onMouseLeave={this.resetBubble.bind(this, locationitem, lindex)}
+                            >
                               <circle className="topBubble" id={`topBubble${locationitem.lid}`} 
-                                r={oR - 20} 
-                                cx={xscale(lindex)} 
-                                cy={0.5 * height} 
+                                r={r} 
+                                cx={0} 
+                                cy={0} 
                                 style={{
                                 'fill': colors[lindex],
-                                'opacity': 0.3
-                              }}></circle>
+                                'opacity': topcircleconfig.opacity
+                                }}
+                                
+                              ></circle>
                               <text className="topBubbleText" 
-                                x={xscale(lindex)}
-                                y={0.5 * height} 
+                                x={0}
+                                y={0} 
                                 textAnchor="middle"
-                                fontSize="16"
+                                fontSize={toptextconfig.fontSize}
                                 dominantBaseline="middle" 
                                 alignmentBaseline="middle"
                                 style={{
@@ -133,7 +175,7 @@ class OperationSection extends Component {
                       }
 
                       {
-                        secondbubbles.map((uitem, index) => {
+                        [].map((uitem, index) => {
                           return <g key={index}>
                             {/* <circle 
                               className={`childBubble${uitem.uid}`} 
@@ -147,47 +189,47 @@ class OperationSection extends Component {
                                 'fill': `${d3.schemeCategory10[index]}`
                               }}></circle> */}
 
-<g transform={`translate(${uitem.x - 15},${uitem.y - 15}) scale(0.12, 0.12)`}>
-        <path d="M0,125A125,125 0 1,1 0,-125A125,125 0 1,1 0,125M0,118.75A118.75,118.75 0 1,0 0,-118.75A118.75,118.75 0 1,0 0,118.75Z" 
-          transform="translate(125,125)" 
-          style={{
-            'fill': 'rgb(23, 139, 202)'
-          }}>
-        </path>
-        <text className="liquidFillGaugeText" 
-          textAnchor="middle" 
-          fontSize="6" 
-          transform="translate(125,146.875)" 
-          style={{
-            'fill': 'rgb(4, 86, 129)'
-          }}>
-          54%
-        </text>
-        <defs>
-          <clipPath id="clipWavefillgauge1" 
-            transform="translate(-212.5,115.58599853515625)">
-              <path d="M0,229.8416687884447L5.625,229.8416687884447L11.25,229.8416687884447L16.875,229.8416687884447L22.5,229.8416687884447L28.125,229.8416687884447L33.75,229.8416687884447L39.375,229.8416687884447L45,229.8416687884447L50.625,229.8416687884447L56.25,229.8416687884447L61.87500000000001,229.8416687884447L67.5,229.8416687884447L73.125,229.8416687884447L78.75,229.8416687884447L84.375,229.8416687884447L90,229.8416687884447L95.625,229.8416687884447L101.25,229.8416687884447L106.875,229.8416687884447L112.5,229.8416687884447L118.125,229.8416687884447L123.75000000000001,229.8416687884447L129.375,229.8416687884447L135,229.8416687884447L140.625,229.8416687884447L146.25,229.8416687884447L151.875,229.8416687884447L157.5,229.8416687884447L163.125,229.8416687884447L168.75,229.8416687884447L174.375,229.8416687884447L180,229.8416687884447L185.625,229.8416687884447L191.25,229.8416687884447L196.875,229.8416687884447L202.5,229.8416687884447L208.125,229.8416687884447L213.75,229.8416687884447L219.375,229.8416687884447L225,229.8416687884447L230.62499999999997,229.8416687884447L236.25,229.8416687884447L241.875,229.8416687884447L247.50000000000003,229.8416687884447L253.125,229.8416687884447L258.75,229.8416687884447L264.375,229.8416687884447L270,229.8416687884447L275.625,229.8416687884447L281.25,229.8416687884447L286.875,229.8416687884447L292.5,229.8416687884447L298.125,229.8416687884447L303.75,229.8416687884447L309.375,229.8416687884447L315,229.8416687884447L320.625,229.8416687884447L326.25,229.8416687884447L331.875,229.8416687884447L337.5,229.8416687884447L343.125,229.8416687884447L348.75,229.8416687884447L354.375,229.8416687884447L360,229.8416687884447L365.625,229.8416687884447L371.25,229.8416687884447L376.875,229.8416687884447L382.5,229.8416687884447L388.125,229.8416687884447L393.75,229.8416687884447L399.375,229.8416687884447L405,229.8416687884447L410.625,229.8416687884447L416.25,229.8416687884447L421.875,229.8416687884447L427.5,229.8416687884447L433.125,229.8416687884447L438.75,229.8416687884447L444.375,229.8416687884447L450,229.8416687884447L450,-2.3717336737201818e-15L444.375,-0.7574038668223285L438.75,-1.4961579367641789L433.125,-2.198071632839377L427.5,-2.8458615103325666L421.875,-3.423576832568512L416.25,-3.916992330986531L410.625,-4.3139584784634275L405,-4.604700650993201L399.375,-4.782059811370225L393.75,-4.841668788444707L388.125,-4.782059811370223L382.5,-4.604700650993199L376.875,-4.313958478463426L371.25,-3.9169923309865293L365.625,-3.42357683256851L360,-2.8458615103325635L354.375,-2.198071632839373L348.75,-1.4961579367641749L343.125,-0.7574038668223244L337.5,1.7788002552901363e-15L331.875,0.757403866822328L326.25,1.4961579367641782L320.625,2.198071632839376L315,2.8458615103325657L309.375,3.423576832568512L303.75,3.916992330986531L298.125,4.3139584784634275L292.5,4.6047006509932L286.875,4.782059811370225L281.25,4.841668788444707L275.625,4.782059811370223L270,4.604700650993199L264.375,4.313958478463425L258.75,3.916992330986527L253.125,3.423576832568507L247.50000000000003,2.845861510332567L241.875,2.1980716328393775L236.25,1.4961579367641753L230.62499999999997,0.757403866822325L225,-1.1858668368600909e-15L219.375,-0.7574038668223316L213.75,-1.4961579367641775L208.125,-2.1980716328393797L202.5,-2.8458615103325657L196.875,-3.423576832568509L191.25,-3.916992330986531L185.625,-4.313958478463425L180,-4.6047006509932L174.375,-4.782059811370223L168.75,-4.841668788444707L163.125,-4.782059811370223L157.5,-4.604700650993199L151.875,-4.313958478463425L146.25,-3.9169923309865293L140.625,-3.4235768325685076L135,-2.8458615103325644L129.375,-2.198071632839376L123.75000000000001,-1.496157936764178L118.125,-0.7574038668223299L112.5,5.929334184300454e-16L106.875,0.757403866822331L101.25,1.4961579367641769L95.625,2.198071632839379L90,2.8458615103325653L84.375,3.423576832568508L78.75,3.91699233098653L73.125,4.313958478463425L67.5,4.6047006509932L61.87500000000001,4.782059811370223L56.25,4.841668788444707L50.625,4.782059811370223L45,4.604700650993199L39.375,4.313958478463425L33.75,3.91699233098653L28.125,3.4235768325685076L22.5,2.845861510332565L16.875,2.1980716328393783L11.25,1.4961579367641762L5.625,0.7574038668223305L0,0Z" 
-                  transform="translate(190.89679104854812,0)">
-              </path>
-          </clipPath>
-        </defs>
-        <g clipPath="url(#clipWavefillgauge1)">
-          <circle cx="125" cy="125" r="112.5" 
-            style={{
-              'fill': 'rgb(23, 139, 202)'
-            }}>
-          </circle>
-          <text className="liquidFillGaugeText" 
-            textAnchor="middle" 
-            fontSize="8" 
-            transform="translate(125,146.875)" 
-            style={{
-              'fill': 'rgb(164, 219, 248)'
-            }}>
-              54%
-          </text>
-        </g>
-      </g>
+                      <g transform={`translate(${uitem.x - 15},${uitem.y - 15}) scale(0.12, 0.12)`}>
+                              <path d="M0,125A125,125 0 1,1 0,-125A125,125 0 1,1 0,125M0,118.75A118.75,118.75 0 1,0 0,-118.75A118.75,118.75 0 1,0 0,118.75Z" 
+                                transform="translate(125,125)" 
+                                style={{
+                                  'fill': 'rgb(23, 139, 202)'
+                                }}>
+                              </path>
+                              <text className="liquidFillGaugeText" 
+                                textAnchor="middle" 
+                                fontSize="6" 
+                                transform="translate(125,146.875)" 
+                                style={{
+                                  'fill': 'rgb(4, 86, 129)'
+                                }}>
+                                54%
+                              </text>
+                              <defs>
+                                <clipPath id="clipWavefillgauge1" 
+                                  transform="translate(-212.5,115.58599853515625)">
+                                    <path d="M0,229.8416687884447L5.625,229.8416687884447L11.25,229.8416687884447L16.875,229.8416687884447L22.5,229.8416687884447L28.125,229.8416687884447L33.75,229.8416687884447L39.375,229.8416687884447L45,229.8416687884447L50.625,229.8416687884447L56.25,229.8416687884447L61.87500000000001,229.8416687884447L67.5,229.8416687884447L73.125,229.8416687884447L78.75,229.8416687884447L84.375,229.8416687884447L90,229.8416687884447L95.625,229.8416687884447L101.25,229.8416687884447L106.875,229.8416687884447L112.5,229.8416687884447L118.125,229.8416687884447L123.75000000000001,229.8416687884447L129.375,229.8416687884447L135,229.8416687884447L140.625,229.8416687884447L146.25,229.8416687884447L151.875,229.8416687884447L157.5,229.8416687884447L163.125,229.8416687884447L168.75,229.8416687884447L174.375,229.8416687884447L180,229.8416687884447L185.625,229.8416687884447L191.25,229.8416687884447L196.875,229.8416687884447L202.5,229.8416687884447L208.125,229.8416687884447L213.75,229.8416687884447L219.375,229.8416687884447L225,229.8416687884447L230.62499999999997,229.8416687884447L236.25,229.8416687884447L241.875,229.8416687884447L247.50000000000003,229.8416687884447L253.125,229.8416687884447L258.75,229.8416687884447L264.375,229.8416687884447L270,229.8416687884447L275.625,229.8416687884447L281.25,229.8416687884447L286.875,229.8416687884447L292.5,229.8416687884447L298.125,229.8416687884447L303.75,229.8416687884447L309.375,229.8416687884447L315,229.8416687884447L320.625,229.8416687884447L326.25,229.8416687884447L331.875,229.8416687884447L337.5,229.8416687884447L343.125,229.8416687884447L348.75,229.8416687884447L354.375,229.8416687884447L360,229.8416687884447L365.625,229.8416687884447L371.25,229.8416687884447L376.875,229.8416687884447L382.5,229.8416687884447L388.125,229.8416687884447L393.75,229.8416687884447L399.375,229.8416687884447L405,229.8416687884447L410.625,229.8416687884447L416.25,229.8416687884447L421.875,229.8416687884447L427.5,229.8416687884447L433.125,229.8416687884447L438.75,229.8416687884447L444.375,229.8416687884447L450,229.8416687884447L450,-2.3717336737201818e-15L444.375,-0.7574038668223285L438.75,-1.4961579367641789L433.125,-2.198071632839377L427.5,-2.8458615103325666L421.875,-3.423576832568512L416.25,-3.916992330986531L410.625,-4.3139584784634275L405,-4.604700650993201L399.375,-4.782059811370225L393.75,-4.841668788444707L388.125,-4.782059811370223L382.5,-4.604700650993199L376.875,-4.313958478463426L371.25,-3.9169923309865293L365.625,-3.42357683256851L360,-2.8458615103325635L354.375,-2.198071632839373L348.75,-1.4961579367641749L343.125,-0.7574038668223244L337.5,1.7788002552901363e-15L331.875,0.757403866822328L326.25,1.4961579367641782L320.625,2.198071632839376L315,2.8458615103325657L309.375,3.423576832568512L303.75,3.916992330986531L298.125,4.3139584784634275L292.5,4.6047006509932L286.875,4.782059811370225L281.25,4.841668788444707L275.625,4.782059811370223L270,4.604700650993199L264.375,4.313958478463425L258.75,3.916992330986527L253.125,3.423576832568507L247.50000000000003,2.845861510332567L241.875,2.1980716328393775L236.25,1.4961579367641753L230.62499999999997,0.757403866822325L225,-1.1858668368600909e-15L219.375,-0.7574038668223316L213.75,-1.4961579367641775L208.125,-2.1980716328393797L202.5,-2.8458615103325657L196.875,-3.423576832568509L191.25,-3.916992330986531L185.625,-4.313958478463425L180,-4.6047006509932L174.375,-4.782059811370223L168.75,-4.841668788444707L163.125,-4.782059811370223L157.5,-4.604700650993199L151.875,-4.313958478463425L146.25,-3.9169923309865293L140.625,-3.4235768325685076L135,-2.8458615103325644L129.375,-2.198071632839376L123.75000000000001,-1.496157936764178L118.125,-0.7574038668223299L112.5,5.929334184300454e-16L106.875,0.757403866822331L101.25,1.4961579367641769L95.625,2.198071632839379L90,2.8458615103325653L84.375,3.423576832568508L78.75,3.91699233098653L73.125,4.313958478463425L67.5,4.6047006509932L61.87500000000001,4.782059811370223L56.25,4.841668788444707L50.625,4.782059811370223L45,4.604700650993199L39.375,4.313958478463425L33.75,3.91699233098653L28.125,3.4235768325685076L22.5,2.845861510332565L16.875,2.1980716328393783L11.25,1.4961579367641762L5.625,0.7574038668223305L0,0Z" 
+                                        transform="translate(190.89679104854812,0)">
+                                    </path>
+                                </clipPath>
+                              </defs>
+                              <g clipPath="url(#clipWavefillgauge1)">
+                                <circle cx="125" cy="125" r="112.5" 
+                                  style={{
+                                    'fill': 'rgb(23, 139, 202)'
+                                  }}>
+                                </circle>
+                                <text className="liquidFillGaugeText" 
+                                  textAnchor="middle" 
+                                  fontSize="8" 
+                                  transform="translate(125,146.875)" 
+                                  style={{
+                                    'fill': 'rgb(164, 219, 248)'
+                                  }}>
+                                    54%
+                                </text>
+                              </g>
+                            </g>
                             <text className={`childBubbleText${uitem.uid}`} 
                                 x={uitem.x} 
                                 y={uitem.y} 
@@ -260,12 +302,29 @@ function mapStateToProps(store) {
 
   // console.warn(userids, usermap, store.checkins)
 
+  var testlocationtree = [{
+    "lid":771946,"count":2,"users":[51647,33817]
+  },{
+    "lid":1426192,"count":1,"users":[34311]
+  },{
+    "lid":3453809,"count":1,"users":[18512]
+  },{
+    "lid":3937313,"count":1,"users":[112956]
+  }];
+
+  var testusertree=[{"uid":18512,"count":1,"checkins":"[{\"name\":\"checkin-2078158\",\"coordinates\":\"[-74.121740967,40.6710719]\",\"lat\":40.6710719,\"lng\":-74.121740967,\"lid\":3453809,\"uid\":18512,\"time\":\"1284138600000\",\"x\":373.82685215462817,\"y\":208.55098537743356,\"zoomLevels\":\"\"}]"},{"uid":33817,"count":1,"checkins":"[{\"name\":\"checkin-2820832\",\"coordinates\":\"[-74.1116481,40.6679821]\",\"lat\":40.6679821,\"lng\":-74.1116481,\"lid\":771946,\"uid\":33817,\"time\":\"1271192913000\",\"x\":373.8412063771566,\"y\":208.55642997839166,\"zoomLevels\":\"\"}]"},{"uid":34311,"count":1,"checkins":"[{\"name\":\"checkin-2851287\",\"coordinates\":\"[-74.10765868,40.67343455]\",\"lat\":40.67343455,\"lng\":-74.10765868,\"lid\":1426192,\"uid\":34311,\"time\":\"1278881302000\",\"x\":373.84688126127,\"y\":208.54682195570052,\"zoomLevels\":\"\"}]"},{"uid":51647,"count":1,"checkins":"[{\"name\":\"checkin-3586281\",\"coordinates\":\"[-74.1116481,40.6679821]\",\"lat\":40.6679821,\"lng\":-74.1116481,\"lid\":771946,\"uid\":51647,\"time\":\"1269285680000\",\"x\":373.8412063771566,\"y\":208.55642997839166,\"zoomLevels\":\"\"}]"},{"uid":112956,"count":1,"checkins":"[{\"name\":\"checkin-5107287\",\"coordinates\":\"[-74.099024838,40.670383532]\",\"lat\":40.670383532,\"lng\":-74.099024838,\"lid\":3937313,\"uid\":112956,\"time\":\"1284780671000\",\"x\":373.8591603971751,\"y\":208.55219838388362,\"zoomLevels\":\"\"}]"}];
+  testusertree.forEach(item => {
+    item.checkins = JSON.parse(item.checkins);
+    item.checkins.forEach(citem => {
+      citem.coordinates = JSON.parse(citem.coordinates);
+    })
+  })
   return {
     edges: store.edges,
     hotspots: store.hotspots,
     checkins: store.checkins,
-    locationtree: store.locationtree,
-    usertree: store.usertree,
+    locationtree: store.locationtree.length > 0 ? store.locationtree : testlocationtree,
+    usertree: store.usertree.length > 0 ? store.usertree : testusertree,
     // checkinsByuid: entries
   }
 }
