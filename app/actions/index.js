@@ -25,16 +25,15 @@ export const get_heat_in_bound = (bounds, successCb=console.log, failCb=console.
     request.then(res => {
       if(res && res.code === 200) {
         var result = res.data;
-        result = result.map(item => {
-          return {
-            name: `checkin-${item.id}`,
-            coordinates: [+item.lng, +item.lat],
-            lat: +item.lat,
-            lng: +item.lng,
-            lid: item.lid,
-            uid: item.uid,
-            time: item.time
-          }
+        
+        result.forEach(item => {
+          item.name= `checkin-${item.id}`,
+          item.coordinates =  [+item.lng, +item.lat],
+          item.lat = +item.lat,
+          item.lng = +item.lng,
+          item.lid = +item.lid,
+          item.uid = +item.uid,
+          item.time = +item.time;
         })
         dispatch({
           type: GET_HEATMAP_SUCCESS,

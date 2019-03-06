@@ -2,26 +2,26 @@
 
 
 .operation-section-wrapper {
-  margin: 10px;
+  margin: 10px 10px 10px 0;
   height: 100%;
   overflow: auto;
   position: relative;
 
 
   .section {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     
     .section-title {
-      margin-bottom: 5px;
-      padding: 5px;
+      margin-bottom: 4px;
+      padding: 3px;
       display: inline-block;
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 12px;
+      line-height: 18px;
       color: #333;
       border: 1px solid #eee;
       border-radius: 3px;
       background: #fff;
-      box-shadow: 2px 2px 5px #ccc;
+      box-shadow: 2px 2px 4px #ccc;
     }
 
     .section-content {
@@ -101,7 +101,6 @@
   .hotspots-section {
     .hotspots-content {
       height: 500px;
-      background: rgba(200, 60, 80, 0.2);
 
       .checkin-svg {
         width: 100%;

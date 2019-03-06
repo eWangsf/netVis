@@ -6,6 +6,7 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import MapSection from 'containers/MapSection';
+import TimelineSection from 'containers/TimelineSection';
 import OperationSection from 'containers/OperationSection';
 
 import './index.scss';
@@ -23,11 +24,18 @@ export default class App extends Component {
     return (
       <Provider store={configureStore()}>
           <div className="layout">
-            <div className="main-section" id="main">
-                <MapSection />
+            <div className="left">
+                <div className="map-section" id="main">
+                    <MapSection />
+                </div>
+                <div className="timeline-section" id="timeline">
+                    <TimelineSection />
+                </div>
             </div>
-            <div className="append-section" id="append">
-                <OperationSection />
+            <div className="right">
+              <div className="append-section" id="append">
+                  <OperationSection />
+              </div>
             </div>
           </div>
       </Provider>

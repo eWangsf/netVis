@@ -1,5 +1,5 @@
 
-export const bubblesvgwidth = 470;
+export const bubblesvgwidth = 598;
 export const bubblesvgheight = 220;
 
 export const margin = {

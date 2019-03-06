@@ -164,25 +164,12 @@ function mapStateToProps(store) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    // getHeat(loctioncount, successCb, failCb) {
-    //   dispatch(get_location_heat(loctioncount, successCb, failCb));
-    // },
     getHeatByBound(bounds, successCb, failCb) {
       dispatch(get_heat_in_bound(bounds, successCb, failCb))
     },
     getCheckinGroupDetail(checkins, successCb, failCb) {
       dispatch(get_checkin_group_detail(checkins, successCb, failCb))
     }
-    // getLocationsByBound(latrange, lngrange, successCb, failCb) {
-    //   dispatch(get_locations_in_bound(latrange, lngrange, successCb, failCb))
-    // },
-    // getLocationUser(latrange, lngrange, successCb, failCb) {
-    //   dispatch(get_location_checkins_in_bound(latrange, lngrange, successCb, failCb));
-    // },
-    // getLocationDetail(lid, successCb, failCb) {
-    //   dispatch(get_location_detail(lid, successCb, failCb));
-    // }
-
   }
 }
 
