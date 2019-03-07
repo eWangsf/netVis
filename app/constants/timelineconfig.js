@@ -1,3 +1,5 @@
+import { mainColor, assistColorBlue, assistColorGreen } from './colors';
+
 export const width = 694;
 export const height = 162;
 export const margin = {
@@ -6,6 +8,9 @@ export const margin = {
   bottom: 10,
   left: 10
 };
-export const lcolor = 'rgba(0, 112, 32, 0.5)';
-export const ucolor = 'rgba(31, 119, 180, 0.5)';
-export const checkincolor = 'rgba(224, 108, 12, 1)';
+// export const lcolor = 'rgba(96, 189, 97, 1)';
+// export const ucolor = 'rgba(89, 156, 205, 1)';
+// export const checkincolor = 'rgba(251, 123, 41, 1)';
+export const lcolor = assistColorGreen;
+export const ucolor = assistColorBlue;
+export const checkincolor = mainColor;

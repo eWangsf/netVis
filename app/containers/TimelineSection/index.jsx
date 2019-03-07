@@ -30,7 +30,8 @@ class TimelineSection extends Component {
       // locationscale: d3.scaleLinear().domain(props.lcountrange).range([svgheight - margin.bottom, margin.top]),
       // checkinscale: d3.scaleLinear().domain(props.ccountrange).range([svgheight - margin.bottom, margin.top]),
        userscale: d3.scaleLinear().domain(props.ucountrange).range([0.5*svgheight, margin.top]),
-      locationscale: d3.scaleLinear().domain(props.lcountrange).range([10, 0.5*svgheight - margin.bottom]),
+      // locationscale: d3.scaleLinear().domain(props.lcountrange).range([10, 0.5*svgheight - margin.bottom]),
+      locationscale: d3.scaleLinear().domain(props.lcountrange).range([0.5*svgheight, svgheight - margin.bottom]),
       checkinscale: d3.scaleLinear().domain(props.ccountrange).range([0.5*svgheight, margin.top]),
     }
   }
@@ -96,11 +97,14 @@ class TimelineSection extends Component {
 
   render() {
 
+
     const { timelinedata } = this.props;
     const { timescale, userscale, locationscale, checkinscale } = this.state;
     var userPathStr = '',
         locationPathStr = '',
         checkinPathStr = '';
+      
+    console.warn(userscale.domain(), userscale.range())
     timelinedata.forEach((timelineitem, tindex) => {
 
       if(tindex === 0) {
@@ -127,29 +131,42 @@ class TimelineSection extends Component {
                 ></path> */}
               {
                 timelinedata.map((timelineitem, tindex) => {
-                  return <rect key={tindex}
+
+                  return <line key={tindex}
                     className="user-item" 
-                    x={timescale(timelineitem.timestamp)} 
-                    y={0.5*svgheight - userscale(timelineitem.ucount)} 
-                    rx="1"
-                    ry="1"
-                    width={2} 
-                    height={userscale(timelineitem.ucount)} 
-                    fill={ucolor}
+                    x1={timescale(timelineitem.timestamp)} 
+                    y1={userscale(timelineitem.ucount)} 
+                    x2={timescale(timelineitem.timestamp)}
+                    y2={0.5*svgheight}
+                    stroke={ucolor}
                     onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
                     onMouseOut={this.hodeTimeInfo.bind(this)}
-                    ></rect>
+                    ></line>
+
+                  // return <rect key={tindex}
+                  //   className="user-item" 
+                  //   x={timescale(timelineitem.timestamp)} 
+                  //   y={0.5*svgheight - userscale(timelineitem.ucount)} 
+                  //   rx="1"
+                  //   ry="1"
+                  //   width={2} 
+                  //   height={userscale(timelineitem.ucount)} 
+                  //   fill={ucolor}
+                  //   onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
+                  //   onMouseOut={this.hodeTimeInfo.bind(this)}
+                  //   ></rect>
+
                 })
               }
             </g>
             <g className="locations">
-              {/* <path 
+              <path 
                 className="locationpath"
                 d={locationPathStr}
                 stroke={lcolor}
                 fill="none"
-                ></path> */}
-              {
+                ></path>
+              {/* {
                 timelinedata.map((timelineitem, tindex) => {
                   return <rect key={tindex}
                     className="location-item" 
@@ -164,7 +181,7 @@ class TimelineSection extends Component {
                     onMouseOut={this.hodeTimeInfo.bind(this)}
                     ></rect>
                 })
-              }
+              } */}
             </g>
             <g className="checkins">
                   <path 
