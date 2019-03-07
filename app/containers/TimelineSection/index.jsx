@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {  } from 'actions';
-import { width as svgwidth, height as svgheight, margin, ucolor, lcolor, checkincolor } from 'constants/timelineconfig';
+import { margin, ucolor, lcolor, checkincolor } from 'constants/timelineconfig';
 
 import * as d3 from 'd3';
 
 import './index.scss';
+
+var svgwidth = 0;
+var svgheight = 0;
 
 class TimelineSection extends Component {
   constructor(props) {
@@ -37,6 +40,8 @@ class TimelineSection extends Component {
   }
 
   componentDidMount() {
+    svgwidth = +(getComputedStyle(document.querySelector('#timeline-svg')).width.slice(0, -2));
+    svgheight = +(getComputedStyle(document.querySelector('#timeline-svg')).height.slice(0, -2));
   }
 
 
@@ -46,7 +51,7 @@ class TimelineSection extends Component {
     //   infoVisible: true
     // })
   }
-  hodeTimeInfo() {
+  hideTimeInfo() {
     console.warn('hide')
     // this.setState({
     //   infoVisible: false
@@ -72,27 +77,41 @@ class TimelineSection extends Component {
     var tooltipg = d3.select('#timeline-svg')
     .append("g")
     .attr('id', 'tooltipg')
-    .style('transform', `translate3d(${e.clientX-margin.left}px, ${e.clientY - 506}px, 0)`);
+    .style('transform', `translate3d(${e.clientX-margin.left}px, 0px, 0)`);
 
+    // tooltipg
+    // .append('rect')
+    // .attr('id', 'tooltip')
+    // .attr('x', 0)
+    // .attr('y', 0)
+    // .attr('rx', 10)
+    // .attr('ry', 10)
+    // .attr('width', 250)
+    // .attr('height', 100)
+    // .attr('fill', 'rgba(255, 255, 255, 1)')
+    // .attr('stroke', 'rgba(0, 0, 0, 0.8)');
     tooltipg
-    .append('rect')
+    .append('line')
     .attr('id', 'tooltip')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('rx', 10)
-    .attr('ry', 10)
-    .attr('width', 250)
-    .attr('height', 100)
-    .attr('fill', 'rgba(255, 255, 255, 1)')
-    .attr('stroke', 'rgba(0, 0, 0, 0.8)');
+    .attr('x1', 0)
+    .attr('y1', 0)
+    .attr('x2', 0)
+    .attr('y2', svgheight)
+    .attr('stroke', 'rgba(0, 0, 0, 0.5)');
     
     tooltipg
     .append('text')
-    .attr('x', 10)
+    .attr('x', (this.state.timescale.range()[1] - (e.clientX - margin.left) < 230) ? '-230' : '10')
     .attr('y', 30)
+    .attr('fontSize', 14)
+    .attr('fill', '#333')
     .text(`${timesStr}: checkincount: ${timelineitem.ccount}`)
 
 
+  }
+
+  hideInfo() {
+      d3.select('#tooltipg').remove();
   }
 
   render() {
@@ -104,9 +123,8 @@ class TimelineSection extends Component {
         locationPathStr = '',
         checkinPathStr = '';
       
-    console.warn(userscale.domain(), userscale.range())
+    console.warn(timescale.domain(), timescale.range())
     timelinedata.forEach((timelineitem, tindex) => {
-
       if(tindex === 0) {
         userPathStr += `M${timescale(timelineitem.timestamp)} ${userscale(timelineitem.ucount)} `;
         locationPathStr += `M${timescale(timelineitem.timestamp)} ${locationscale(timelineitem.lcount)} `;
@@ -119,7 +137,7 @@ class TimelineSection extends Component {
     })
 
     return <div className="timeline-section-wrapper">
-        <svg className="timeline-svg" id="timeline-svg" onMouseMove={this.showInfo.bind(this)}>
+        <svg className="timeline-svg" id="timeline-svg" onMouseMove={this.showInfo.bind(this)} onMouseOut={this.hideInfo.bind(this)}>
 
             <g className="users">
               
@@ -140,7 +158,7 @@ class TimelineSection extends Component {
                     y2={0.5*svgheight}
                     stroke={ucolor}
                     onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
-                    onMouseOut={this.hodeTimeInfo.bind(this)}
+                    onMouseOut={this.hideTimeInfo.bind(this)}
                     ></line>
 
                   // return <rect key={tindex}
@@ -153,7 +171,7 @@ class TimelineSection extends Component {
                   //   height={userscale(timelineitem.ucount)} 
                   //   fill={ucolor}
                   //   onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
-                  //   onMouseOut={this.hodeTimeInfo.bind(this)}
+                  //   onMouseOut={this.hideTimeInfo.bind(this)}
                   //   ></rect>
 
                 })
