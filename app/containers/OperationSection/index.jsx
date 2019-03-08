@@ -22,6 +22,13 @@ class OperationSection extends Component {
       activeLocationIndex: -1,
     }
   } 
+  static getDerivedStateFromProps(props, state) {
+    return {
+      ...state,
+      locationtree: props.locationtree.map(item => +item.lid === +state.activeLocation.lid ? {...item, active: true} : item),
+      usertree: props.usertree,
+    }
+  }
 
   componentDidMount() {
     this.props.getHotSpots((hotspots) => {
@@ -31,15 +38,7 @@ class OperationSection extends Component {
       })
     })
   }
-
-  static getDerivedStateFromProps(props, state) {
-    return {
-      ...state,
-      locationtree: props.locationtree.map(item => +item.lid === +state.activeLocation.lid ? {...item, active: true} : item),
-      usertree: props.usertree,
-    }
-  }
-
+  
   toggleUnsualSection() {
     this.setState({
       unsualshow: !this.state.unsualshow
@@ -107,6 +106,7 @@ class OperationSection extends Component {
     topcircleconfig.hoverRadius = radiusradio*everypercent + 20;
 
     var xscale = d3.scaleLinear().domain([0, nTop-1]).range([margin.left + topcircleconfig.radius, bubblesvgwidth - margin.right - topcircleconfig.radius - topcircleconfig.bubblemargin - 2.5 * childcircleconfig.radius]),
+        bubbledscale = d3.scaleLinear().domain([0, 1]).range([0, 2*Math.PI]),
         colors = [];
 
     for(var i = 0; i < Math.ceil(nTop/10); i++) {
@@ -153,17 +153,34 @@ class OperationSection extends Component {
                           if(hasActive && activeLocationIndex < lindex) {
                             cx += movestep;
                           }
+                          console.warn(locationitem);
+                          // locationitem.usermap.forEach(umitem => {
+                          //   var r1 = r,
+                          //       r2 = r *0.65;
+                          //   var path = `M${r1*Math.cos(bubbledscale())}`;
+
+                          //   return <path d={path} fill={userinfo.color}></path>
+                          // })
 
                           // second bubbles start
                           var degreescale = d3.scaleLinear().domain([0, locationitem.users.length -1]).range([-0.25*Math.PI, 0.25*Math.PI]);
-                          var _sarr = locationitem.users.map((userid, uindex) => {
+                          var step = 0;
+                          var _sarr = locationitem.usermap.map((useritem, uindex) => {
+                            var userinfo = usertree.find(item => +item.uid === +useritem.uid);
+                            var r1 = r,
+                                r2 = r *0.65,
+                                startdegree = bubbledscale( step/(+locationitem.count) ),
+                                enddegree = bubbledscale( (step+useritem.count)/(+locationitem.count) );
+                            step += useritem.count;
                             return {
                               lid: locationitem.lid,
-                              uid: +userid,
+                              uid: +useritem.uid,
                               r: childcircleconfig.radius,
                               x: cx + (r+topcircleconfig.bubblemargin+childcircleconfig.radius) * Math.cos(degreescale(uindex)),
                               y: cy - (r+topcircleconfig.bubblemargin+childcircleconfig.radius) * Math.sin(degreescale(uindex)),
-                              active: active
+                              active: active,
+                              path: `M0 0L${r1*Math.cos(startdegree)} ${r1*Math.sin(startdegree)}A${r1} ${r1} 0 ${enddegree-startdegree < Math.PI ? 0 : 1} 1 ${r1*Math.cos(enddegree)} ${r1*Math.sin(enddegree)}Z`,
+                              color: userinfo.color
                             }
                           })
                           secondbubbles = secondbubbles.concat(_sarr);
@@ -185,7 +202,20 @@ class OperationSection extends Component {
                                 'fill': colors[lindex],
                                 'opacity': topcircleconfig.opacity
                                 }}
-                                
+                              ></circle>
+                              
+                              {
+                                _sarr.map(item => {
+                                  return <path d={item.path} fill={item.color} ></path>
+                                })
+                              }
+                              <circle 
+                                r={r*0.65} 
+                                cx={0} 
+                                cy={0} 
+                                style={{
+                                  'fill': '#fff'
+                                }}
                               ></circle>
                               <text className="topBubbleText" 
                                 x={0}
@@ -229,7 +259,7 @@ class OperationSection extends Component {
                             <path d={`M0,${r}A${r},${r} 0 1,1 0,-${r}A${r},${r} 0 1,1 0,${r}M0,${inner_r}A${inner_r},${inner_r} 0 1,0 0,-${inner_r}A${inner_r},${inner_r} 0 1,0 0,${inner_r}Z`} 
                               className={`childBubblePath childBubblePath${uitem.uid}`} 
                               style={{
-                                  'fill': 'rgb(23, 139, 202)'
+                                  'fill': userinfo.color
                                 }}>
                             </path>
 
@@ -324,18 +354,19 @@ function mapStateToProps(store) {
   // console.warn(userids, usermap, store.checkins)
 
   var testlocationtree = [{
-    "lid":771946,"count":2,"users":[51647,33817]
+    "lid":771946,"count":3,"users":[51647,33817],usermap: [{uid: 51647, count: 1}, {uid: 33817, count: 2}]
   },{
-    "lid":1426192,"count":1,"users":[34311]
+    "lid":1426192,"count":1,"users":[34311],usermap: [{uid: 34311, count: 1}]
   },{
-    "lid":3453809,"count":1,"users":[18512]
+    "lid":3453809,"count":1,"users":[18512],usermap: [{uid: 18512, count: 1}]
   },{
-    "lid":3937313,"count":1,"users":[112956]
+    "lid":3937313,"count":1,"users":[112956],usermap: [{uid: 112956, count: 1}]
   }];
 
   var testusertree=[{
     "uid":18512,
     "count":1,
+    "color": 'rgba(23, 65, 87, 1)',
     "total": 346,
     "checkins": [
       {"name":"checkin-2078158","coordinates":[-74.121740967,40.6710719],"lat":40.6710719,"lng":-74.121740967,"lid":3453809,"uid":18512,"time":"1284138600000","x":373.82685215462817,"y":208.55098537743356,"zoomLevels":""}
@@ -343,6 +374,7 @@ function mapStateToProps(store) {
   },{
     "uid":33817,
     "count":1,
+    "color": 'rgba(254, 123, 1, 1)',
     "total": 225,
     "checkins":[
       {"name":"checkin-2820832","coordinates":[-74.1116481,40.6679821],"lat":40.6679821,"lng":-74.1116481,"lid":771946,"uid":33817,"time":"1271192913000","x":373.8412063771566,"y":208.55642997839166,"zoomLevels":""}
@@ -350,6 +382,7 @@ function mapStateToProps(store) {
   },{
     "uid":34311,
     "count":1,
+    "color": 'rgba(134, 63, 87, 1)',
     "total": 223,
     "checkins":
     [
@@ -358,6 +391,7 @@ function mapStateToProps(store) {
     },{
       "uid":51647,
       "count":1,
+      "color": 'rgba(7, 124, 18, 1)',
       "total": 47,
       "checkins":[
         {"name":"checkin-3586281","coordinates":[-74.1116481,40.6679821],"lat":40.6679821,"lng":-74.1116481,"lid":771946,"uid":51647,"time":"1269285680000","x":373.8412063771566,"y":208.55642997839166,"zoomLevels":""}
@@ -365,6 +399,7 @@ function mapStateToProps(store) {
     },{
       "uid":112956,
       "count":1,
+      "color": 'rgba(23, 98, 180, 1)',
       "total": 2, //299
       "checkins":[
         {"name":"checkin-5107287","coordinates":[-74.099024838,40.670383532],"lat":40.670383532,"lng":-74.099024838,"lid":3937313,"uid":112956,"time":"1284780671000","x":373.8591603971751,"y":208.55219838388362,"zoomLevels":""}

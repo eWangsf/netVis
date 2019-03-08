@@ -94,22 +94,22 @@ class TimelineSection extends Component {
     .style('transform', `translate3d(${(this.state.timescale.range()[1] - (x) < 100) ? '-100' : '10'}px, 30px, 0)`);
 
     textsg.append('text')
-    .attr('y', "40")
+    .attr('y', `${0.5*svgheight-51}`)
     .style('font-size', "12px")
     .text(`time:${timesStr}`);
 
     textsg.append('text')
-    .attr('y', "54")
+    .attr('y', `${0.5*svgheight-37}`)
     .style('font-size', "12px")
     .text(`checkincount: ${timelineitem.ccount}`);
 
     textsg.append('text')
-    .attr('y', "68")
+    .attr('y', `${0.5*svgheight-23}`)
     .style('font-size', "12px")
     .text(`usercount: ${timelineitem.ucount}`);
 
     textsg.append('text')
-    .attr('y', "82")
+    .attr('y', `${0.5*svgheight-7}`)
     .style('font-size', "12px")
     .text(`locationcount: ${timelineitem.lcount}`);
 
@@ -117,7 +117,7 @@ class TimelineSection extends Component {
   }
 
   hideInfo() {
-      // d3.select('#tooltipg').remove();
+      d3.select('#tooltipg').remove();
   }
 
   render() {

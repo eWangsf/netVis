@@ -83,10 +83,18 @@
 
       .topBubbleAndText {
         transition: transform 0.5s;
+        circle {
+          transition: r 0.5s, cx 0.5s;
+        }
+        path {
+          transition: d 0.5s;
+        }
+
+        text {
+          font-size: 12px;
+        }
       }
-      .topBubble {
-        transition: r 0.5s, cx 0.5s;
-      }
+      
       .childBubbleAndText {
         transition: transform 0.5s;
       }

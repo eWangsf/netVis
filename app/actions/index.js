@@ -61,6 +61,7 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
         lmap[item.lid] = {
           count: 0,
           users: [],
+          usermap: {}
         }
       }
       if(!umap[item.uid]) {
@@ -70,6 +71,13 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
         }
       }
       lmap[item.lid].count ++;
+      if(!lmap[item.lid].usermap[item.uid]) {
+        lmap[item.lid].usermap[item.uid] = {
+          uid: item.uid,
+          count: 0
+        };
+      }
+      lmap[item.lid].usermap[item.uid].count ++;
       if(!lmap[item.lid].users.includes(item.uid)) {
         lmap[item.lid].users.push(+item.uid);
       }
@@ -85,11 +93,13 @@ export const get_checkin_group_detail = (checkins, successCb=console.log, failCb
           lid: +item,
           count: lmap[item].count,
           users: lmap[item].users,
+          usermap: lmap[item].users.map(item2 => lmap[item].usermap[item2])
         }
       }),
       usertree: Object.keys(umap).map(item => {
         return {
           uid: +item,
+          color: `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 1)`,
           count: umap[item].count,
           checkins: umap[item].checkins
         }
