@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { get_hotspots, get_checkins_by_lid } from 'actions';
+import { get_hotspots, get_checkins_by_lid, get_alllocations_by_userlist } from 'actions';
 
 import { bubblesvgwidth, bubblesvgheight, margin, movestep, 
   topcircleconfig, toptextconfig, childcircleconfig, childtextconfig
@@ -9,7 +9,6 @@ import { bubblesvgwidth, bubblesvgheight, margin, movestep,
 import * as d3 from 'd3';
 
 import './index.scss';
-import 'libs/timeseries/style.css';
 
 
 class OperationSection extends Component {
@@ -75,7 +74,12 @@ class OperationSection extends Component {
   }
 
   selectLocation(location) {
-    console.warn('selectLocation', location)
+    console.warn('selectLocation', )
+    var users = location.users;
+
+    this.props.getAllLocationsByUserList(users, () => {
+        console.warn(this.props.locationlist)
+    })
   }
 
   selectUserInLocation(user) {
@@ -84,10 +88,10 @@ class OperationSection extends Component {
 
 
   render() {
-
+    const { locationlist } = this.props;
     var { locationtree, usertree, activeLocation, activeLocationIndex } = this.state;
 
-    var nTop = this.props.locationtree.length;
+    var nTop = locationtree.length;
 
     var radiusradio = 2.5;
     var bubblemarginratio = 0.25;
@@ -115,7 +119,6 @@ class OperationSection extends Component {
 
             <div className={`section unusualspots-section ${this.state.unsualshow ? '' : 'hidden'}`}>
                 <div className="section-content spot-list">
-
                   {
                     this.props.hotspots && this.props.hotspots.length > 0 && this.state.hotscale ? this.props.hotspots.map(item => {
                       return <div className="spot-item hot-spot" key={`location-${item.id}`} onClick={this.selectSpotHandler.bind(this, item)} style={{
@@ -127,16 +130,15 @@ class OperationSection extends Component {
                       </div>
                     }) : <div>暂无热点数据</div>
                   }
-
                 </div>
                 <div className="section-icon" onClick={this.toggleUnsualSection.bind(this)}></div>
             </div>
     
             <div className="section clusters-section">
-              <div className="section-title">clusters</div>
+              {/* <div className="section-title">clusters</div> */}
               <div className="section-content">
                   <svg id="bubblesvg" className="bubblesvg">
-                      {
+                  {
                         locationtree && locationtree.length > 0 ? locationtree.map((locationitem, lindex) => {
                           var hasActive = activeLocationIndex >= 0;
                           var active = +activeLocation.lid === +locationitem.lid;
@@ -174,7 +176,6 @@ class OperationSection extends Component {
                                 onMouseOver={this.activateBubble.bind(this, locationitem, lindex)} 
                                 onMouseLeave={this.resetBubble.bind(this, locationitem, lindex)}
                                 onClick={this.selectLocation.bind(this, locationitem)}
-
                             >
                               <circle className="topBubble" id={`topBubble${locationitem.lid}`} 
                                 r={r} 
@@ -199,7 +200,6 @@ class OperationSection extends Component {
                           </g>
                         }) : <div className="empty">empty</div>
                       }
-
                       {
                         secondbubbles.map((uitem, index) => {
                           var r = childcircleconfig.radius,
@@ -261,13 +261,24 @@ class OperationSection extends Component {
                         })
                       }
                   </svg>
-                {/* <p>hotspots: {this.props.hotspots.length}</p>
-                <p>edges: {this.props.edges.length}</p>
-                <p>checkins: {this.props.checkins.length}</p> */}
               </div>
             </div>
 
-            <div className="section hotspots-section">
+            <div className="section record-section">
+              <div className="section-content">
+                  {
+                    locationlist.map((litem, lindex) => {
+                      return <div key={litem.lid} className={`location-item location-item-${litem.lid} ${lindex % 2 === 1 ? 'location-item-even' : ''}`}>
+                          <div className="cell location-id">{litem.lid}</div>
+                          <div className="cell location-userscount">{litem.users.length}</div>
+                          <div className="cell location-weight">{litem.weight}</div>
+                      </div>
+                    })
+                  }
+              </div>
+            </div>
+
+            {/* <div className="section hotspots-section">
               <div className="section-title">checkinsbyuid</div>
               <div className="section-content hotspots-content">
                 <svg id="checkin-svg" className="checkin-svg">
@@ -280,12 +291,9 @@ class OperationSection extends Component {
                   </g>
                 </svg>
               </div>
-            </div>
-
-            {/* <div className="section record-section">
-              <div className="section-title">record</div>
-              
             </div> */}
+
+
 
       </div>
   }
@@ -363,9 +371,9 @@ function mapStateToProps(store) {
       ]
     }];
   return {
-    edges: store.edges,
     hotspots: store.hotspots,
     checkins: store.checkins,
+    locationlist: store.locationlist,
     locationtree: store.locationtree.length > 0 ? store.locationtree : testlocationtree,
     usertree: store.usertree.length > 0 ? store.usertree : testusertree,
     // checkinsByuid: entries
@@ -378,9 +386,11 @@ function mapDispatchToProps(dispatch) {
       dispatch(get_hotspots(successCb, failCb));
     },
     getCheckinByLocation(lid, successCb, failCb) {
-      dispatch(get_checkins_by_lid(lid, successCb, failCb))
+      dispatch(get_checkins_by_lid(lid, successCb, failCb));
+    },
+    getAllLocationsByUserList(users, successCb, failCb) {
+      dispatch(get_alllocations_by_userlist(users, successCb, failCb));
     }
-    
 
   }
 }

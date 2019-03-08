@@ -2,7 +2,8 @@
 import api from '../api'
 import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_USERS_CHECKIN_TOTAL_SUCCESS,
   GET_HOTSPOTS_SUCCESS,
-  GET_LOCATION_CHECKINS
+  GET_LOCATION_CHECKINS,
+  GET_LOCATIONS_BY_USERS
   } from '../constants/actionTypes';
 
 var bound_seed = 0;
@@ -144,6 +145,47 @@ export const get_checkins_by_lid = (lid, successCb=console.log, failCb=console.l
         // successCb([checkins[0].time, checkins[checkins.length - 1].time])
         successCb()
       }
+    })
+  }
+}
+
+export const get_alllocations_by_userlist = (users, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.post('/checkins/locationsbyusers', {
+      users
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+
+        var locationmap = {};
+        var alllocations = res.data;
+
+        alllocations.forEach(checkin => {
+          if(!locationmap[checkin.lid]) {
+            locationmap[checkin.lid] = {
+              lid: +checkin.lid,
+              users: [],
+              weight: 0,
+            }
+          }
+          locationmap[checkin.lid].weight++;
+          if(!locationmap[checkin.lid].users.includes(+checkin.uid)) {
+            locationmap[checkin.lid].users.push(+checkin.uid);
+          }
+        })
+
+        var locationlist = Object.keys(locationmap).map(item => locationmap[item])
+
+        dispatch({
+          type: GET_LOCATIONS_BY_USERS,
+          data: locationlist.sort((x, y) => {
+            return x.weight < y.weight ? 1 : -1;
+          }),
+
+        })
+
+        successCb();
+      } 
     })
   }
 }

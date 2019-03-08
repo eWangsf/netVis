@@ -3,7 +3,8 @@ var checkin = {
   checkinAll: 'select * from checkin',
   checkinByBound: 'select * from checkin where lat > ? and lat < ? and lng > ? and lng < ?',
   checkinByLocationId: 'select * from checkin where lid=?',
-  checkinTotalByuid: 'select count(id) as count from checkin where uid=?'
+  checkinTotalByuid: 'select count(id) as count from checkin where uid=?',
+  checkinByUid: 'select * from checkin where uid=?'
 }
 
 module.exports = checkin;

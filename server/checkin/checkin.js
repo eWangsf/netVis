@@ -125,5 +125,19 @@ module.exports = {
         connection.release();
       });
     });
+  },
+  getCheckinsByUid(uid, resolve, reject) {
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.checkinByUid, [uid], function (err, result) {
+        if(typeof result === 'undefined') {
+          reject(err);
+          connection.release();
+          return ;
+        }
+
+        resolve(result);
+        connection.release();
+      });
+    });
   }
 }

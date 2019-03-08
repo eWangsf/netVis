@@ -6,7 +6,7 @@ export const margin = {
   top: 10,
   right: 10,
   bottom: 10,
-  left: 10
+  left: 60
 };
 // export const lcolor = 'rgba(96, 189, 97, 1)';
 // export const ucolor = 'rgba(89, 156, 205, 1)';

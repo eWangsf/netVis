@@ -9,6 +9,7 @@ import './index.scss';
 
 var svgwidth = 0;
 var svgheight = 0;
+var formertime = 0;
 
 class TimelineSection extends Component {
   constructor(props) {
@@ -44,26 +45,15 @@ class TimelineSection extends Component {
     svgheight = +(getComputedStyle(document.querySelector('#timeline-svg')).height.slice(0, -2));
   }
 
-
-  showTimeInfo(timelineitem) {
-    console.warn('show: ', timelineitem);
-    // this.setState({
-    //   infoVisible: true
-    // })
-  }
-  hideTimeInfo() {
-    console.warn('hide')
-    // this.setState({
-    //   infoVisible: false
-    // })
-  }
   showInfo(e) {
-    
     var x = e.clientX - 10;
     if(x < margin.left) {
       return ;
     }
-    
+    if((new Date()).getTime() - formertime < 300) {
+      formertime = (new Date()).getTime();
+      return ;
+    }
     var timestamp = this.state.timescale.invert(x);
     timestamp = Math.floor((timestamp - this.state.timescale.domain()[0]) / 86400000) * 86400000 + this.state.timescale.domain()[0];
     var timelineitem = this.props.timelinedata.find(item => +item.timestamp === +timestamp);
@@ -77,7 +67,7 @@ class TimelineSection extends Component {
     var tooltipg = d3.select('#timeline-svg')
     .append("g")
     .attr('id', 'tooltipg')
-    .style('transform', `translate3d(${e.clientX-margin.left}px, 0px, 0)`);
+    .style('transform', `translate3d(${x}px, 0px, 0)`);
 
     // tooltipg
     // .append('rect')
@@ -99,19 +89,35 @@ class TimelineSection extends Component {
     .attr('y2', svgheight)
     .attr('stroke', 'rgba(0, 0, 0, 0.5)');
     
-    tooltipg
-    .append('text')
-    .attr('x', (this.state.timescale.range()[1] - (e.clientX - margin.left) < 230) ? '-230' : '10')
-    .attr('y', 30)
-    .attr('fontSize', 14)
-    .attr('fill', '#333')
-    .text(`${timesStr}: checkincount: ${timelineitem.ccount}`)
+    var textsg = tooltipg
+    .append('g')
+    .style('transform', `translate3d(${(this.state.timescale.range()[1] - (x) < 100) ? '-100' : '10'}px, 30px, 0)`);
+
+    textsg.append('text')
+    .attr('y', "40")
+    .style('font-size', "12px")
+    .text(`time:${timesStr}`);
+
+    textsg.append('text')
+    .attr('y', "54")
+    .style('font-size', "12px")
+    .text(`checkincount: ${timelineitem.ccount}`);
+
+    textsg.append('text')
+    .attr('y', "68")
+    .style('font-size', "12px")
+    .text(`usercount: ${timelineitem.ucount}`);
+
+    textsg.append('text')
+    .attr('y', "82")
+    .style('font-size', "12px")
+    .text(`locationcount: ${timelineitem.lcount}`);
 
 
   }
 
   hideInfo() {
-      d3.select('#tooltipg').remove();
+      // d3.select('#tooltipg').remove();
   }
 
   render() {
@@ -123,7 +129,6 @@ class TimelineSection extends Component {
         locationPathStr = '',
         checkinPathStr = '';
       
-    console.warn(timescale.domain(), timescale.range())
     timelinedata.forEach((timelineitem, tindex) => {
       if(tindex === 0) {
         userPathStr += `M${timescale(timelineitem.timestamp)} ${userscale(timelineitem.ucount)} `;
@@ -137,8 +142,8 @@ class TimelineSection extends Component {
     })
 
     return <div className="timeline-section-wrapper">
-        <svg className="timeline-svg" id="timeline-svg" onMouseMove={this.showInfo.bind(this)} onMouseOut={this.hideInfo.bind(this)}>
-
+        <svg className="timeline-svg" id="timeline-svg" onMouseOver={this.showInfo.bind(this)} onMouseOut={this.hideInfo.bind(this)}>
+    
             <g className="users">
               
                 {/* <path 
@@ -157,8 +162,6 @@ class TimelineSection extends Component {
                     x2={timescale(timelineitem.timestamp)}
                     y2={0.5*svgheight}
                     stroke={ucolor}
-                    onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
-                    onMouseOut={this.hideTimeInfo.bind(this)}
                     ></line>
 
                   // return <rect key={tindex}
@@ -178,28 +181,24 @@ class TimelineSection extends Component {
               }
             </g>
             <g className="locations">
-              <path 
+              {/* <path 
                 className="locationpath"
                 d={locationPathStr}
                 stroke={lcolor}
                 fill="none"
-                ></path>
-              {/* {
+                ></path> */}
+              {
                 timelinedata.map((timelineitem, tindex) => {
-                  return <rect key={tindex}
+                  return <line key={tindex}
                     className="location-item" 
-                    x={timescale(timelineitem.timestamp)} 
-                    y={0.5 * svgheight} 
-                    rx="1"
-                    ry="1"
-                    width={2} 
-                    height={locationscale(timelineitem.lcount)} 
-                    fill={lcolor}
-                    onMouseOver={this.showTimeInfo.bind(this, timelineitem)}
-                    onMouseOut={this.hodeTimeInfo.bind(this)}
-                    ></rect>
+                    x1={timescale(timelineitem.timestamp)} 
+                    y1={0.5 * svgheight} 
+                    x2={timescale(timelineitem.timestamp)}
+                    y2={locationscale(timelineitem.lcount)}
+                    stroke={lcolor}
+                    ></line>
                 })
-              } */}
+              }
             </g>
             <g className="checkins">
                   <path 
@@ -210,7 +209,46 @@ class TimelineSection extends Component {
                     ></path>
             </g>
           
-  
+            <g className="annotations">
+                {/* <line
+                  x1="0"
+                  y1="0"
+                  x2="15"
+                  y2="0"
+                  stroke={ucolor}
+                  strokeWidth="2"
+                ></line> */}
+                <text
+                    x="15"
+                    y={svgheight*0.5-18}
+                    dominantBaseline="middle" 
+                    alignmentBaseline="middle"
+                    fontSize="12"
+                    fill={ucolor}
+                    style={{
+                    }}
+                >user</text>
+                <text
+                    x="15"
+                    y={svgheight*0.5}
+                    dominantBaseline="middle" 
+                    alignmentBaseline="middle"
+                    fontSize="12"
+                    fill={checkincolor}
+                    style={{
+                    }}
+                >checkin</text>
+                <text
+                    x="15"
+                    y={svgheight*0.5+18}
+                    dominantBaseline="middle" 
+                    alignmentBaseline="middle"
+                    fontSize="12"
+                    fill={lcolor}
+                    style={{
+                    }}
+                >location</text>
+            </g>
         </svg>
       </div>
   }

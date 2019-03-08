@@ -126,6 +126,13 @@ class MainSection extends Component {
         lngopacityscale = d3.scaleLinear().domain([0, lngmaxcount]).range([0.1, 1]);
 
     return <div className="map-section-wrapper">
+        <div className="annotation-wrapper">
+          <div className="annotation"></div>
+          <div className="annotation-text">
+              <div className="arrow"></div>
+              <div className="text">+</div>
+          </div>
+        </div>
         <div className="longitude-map">
           <svg className="longitude-map-svg" id="longitude-map-svg">
             <g className="longitude-map-group">
