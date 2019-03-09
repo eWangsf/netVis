@@ -3,7 +3,7 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    main: path.resolve(__dirname, './app/main'),
+    main: path.resolve(__dirname, './app/index'),
     // append: path.resolve(__dirname, './app/append'),
   },
   module: {
