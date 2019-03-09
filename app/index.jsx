@@ -9,6 +9,7 @@ import App from 'containers/App';
 
 
 import './index.scss';
+import 'antd/dist/antd.css';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,

@@ -1,8 +1,12 @@
 @import '../../variable.scss';
 
 .map-section-wrapper {
-  height: 100%;
+  margin: 10px;
+  height: calc(100% - 20px);
+  background: #fff;
+  border-radius: 10px;
   position: relative;
+
 
   .annotation-wrapper {
     width: 30px;

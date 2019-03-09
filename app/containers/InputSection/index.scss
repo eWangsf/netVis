@@ -1,0 +1,66 @@
+
+
+.input-section-wrapper {
+  margin: 10px 0 10px 10px;
+  height: calc(100% - 20px);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  .param-section {
+    flex: 1;
+  }
+  .param-item {
+    margin-bottom: 30px;
+    .param-item-title {
+      font-size: 14px;
+      line-height: 26px;
+      .anticon {
+        margin-right: 5px;
+      }
+    }
+    .param-item-content {
+      margin-left: 20px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .location-preference-item {
+      margin: 0 10px 10px 0;
+      width: 52px;
+      img {
+        width: 100%;
+      }
+    }
+    .location-add-btn {
+      margin: 7px 0 0 0;
+      font-size: 22px;
+    }
+    .hot-slider {
+      width: 85%;
+      .ant-slider-mark-text,
+      .ant-slider-mark-text.ant-slider-mark-text-active {
+        font-size: 10px;
+      }
+    }
+  }
+  .input-number {
+    width: 100%;
+  }
+  .operation-section {
+    height: 150px;
+    text-align: center;
+    
+    .input-btn {
+      margin: 10px auto;
+      width: 60%;
+      min-width: 165px;
+      max-width: 250px;
+    }
+  }
+
+
+
+}

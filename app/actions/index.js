@@ -203,6 +203,13 @@ export const get_alllocations_by_userlist = (users, successCb=console.log, failC
 }
 
 
+export const generate_locations = (params, successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    console.warn(params);
+    setTimeout(successCb, 2000);
+  }
+}
+
  
 
  

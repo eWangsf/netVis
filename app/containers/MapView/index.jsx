@@ -16,11 +16,11 @@ class MapView extends Component {
     super(props);
   } 
   
-  static getDerivedStateFromProps(props, state) {
-    return {
-      ...state
-    }
-  }
+  // static getDerivedStateFromProps(props, state) {
+  //   return {
+  //     ...state
+  //   }
+  // }
 
   componentDidMount() {
   }
@@ -29,12 +29,12 @@ class MapView extends Component {
     
     return <div className="layout mapview-layout">
               <div className="left">
-                  <div className="timeline-section" id="timeline">
+                  <div className="input-section">
                       <InputSection />
                   </div>
               </div>
               <div className="right">
-                  <div className="map-section" id="main">
+                  <div className="map-section">
                       <MapSection />
                   </div>
               </div>

@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ant-design-pro": "^2.2.1",
+    "antd": "^3.15.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "body-parser-xml": "^1.1.0",
