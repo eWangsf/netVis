@@ -80,9 +80,10 @@
       width: 100%;
       height: 220px;
 
-
       .topBubbleAndText {
         transition: transform 0.5s;
+        cursor: pointer;
+
         circle {
           transition: r 0.5s, cx 0.5s;
         }
@@ -96,6 +97,7 @@
       }
       
       .childBubbleAndText {
+        cursor: pointer;
         transition: transform 0.5s;
       }
 
@@ -110,6 +112,7 @@
     .section-content {
       margin-top: 10px;
       overflow-y: auto;
+      position: relative;
     }
 
     .location-item {
@@ -119,16 +122,33 @@
       text-align: right;
       .cell {
         padding: 0 3px;
-        width: 30px;
+        width: 50px;
+        text-align: left;
       }
 
-      .location-id {
-        width: 80px;
+      .location-id,
+      .location-lat,
+      .location-lng {
+        width: 100px;
       }
     }
     .location-item.location-item-even {
       background: #efefef;
     }
+    .location-item.location-item-header {
+      height: 42px;
+      background: #e5e5e5;
+
+      .cell {
+        transform: rotate3d(0, 0, 1, -45deg) translate3d(-5px, -1px, 0);
+      }
+      .location-id,
+      .location-lat,
+      .location-lng {
+        transform: rotate3d(0, 0, 1, -45deg) translate3d(15px, -8px, 0);
+      }
+    }
+    
   }
 
   .hotspots-section {
@@ -146,6 +166,13 @@
         }
       }
     }
+  }
+
+  .locationDetailSvg {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    position: absolute;
   }
 
 }

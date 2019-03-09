@@ -174,6 +174,8 @@ export const get_alllocations_by_userlist = (users, successCb=console.log, failC
           if(!locationmap[checkin.lid]) {
             locationmap[checkin.lid] = {
               lid: +checkin.lid,
+              lat: +checkin.lat,
+              lng: +checkin.lng,
               users: [],
               weight: 0,
             }

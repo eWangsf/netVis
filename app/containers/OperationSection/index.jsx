@@ -85,6 +85,13 @@ class OperationSection extends Component {
     console.warn('selectUserInLocation', user);
   }
 
+  showLocationCheckinDetail(locationitem) {
+    console.warn('showLocationCheckinDetail', locationitem.lid)
+  }
+  hideLocationCheckinDetail() {
+    // d3.select('#locationDetailSvg').remove();
+  }
+
 
   render() {
     const { locationlist } = this.props;
@@ -153,7 +160,6 @@ class OperationSection extends Component {
                           if(hasActive && activeLocationIndex < lindex) {
                             cx += movestep;
                           }
-                          console.warn(locationitem);
                           // locationitem.usermap.forEach(umitem => {
                           //   var r1 = r,
                           //       r2 = r *0.65;
@@ -205,8 +211,8 @@ class OperationSection extends Component {
                               ></circle>
                               
                               {
-                                _sarr.map(item => {
-                                  return <path d={item.path} fill={item.color} ></path>
+                                _sarr.map((item, index) => {
+                                  return <path d={item.path} fill={item.color} key={index}></path>
                                 })
                               }
                               <circle 
@@ -296,15 +302,29 @@ class OperationSection extends Component {
 
             <div className="section record-section">
               <div className="section-content">
+                  <div className="location-item location-item-header location-item-even">
+                      <div className="cell location-id">位置id</div>
+                      <div className="cell location-lng">经度</div>
+                      <div className="cell location-lat">纬度</div>
+                      <div className="cell location-userscount">用户数</div>
+                      <div className="cell location-weight">签到数</div>
+                  </div>
+                  <svg className="locationDetailSvg" id="locationDetailSvg"></svg>
                   {
                     locationlist.map((litem, lindex) => {
-                      return <div key={litem.lid} className={`location-item location-item-${litem.lid} ${lindex % 2 === 1 ? 'location-item-even' : ''}`}>
+                      return <div key={litem.lid} className={`location-item location-item-${litem.lid} ${lindex % 2 === 1 ? 'location-item-even' : ''}`}
+                        onMouseOver={this.showLocationCheckinDetail.bind(this, litem)}
+                        onMouseOut={this.hideLocationCheckinDetail.bind(this, litem)}
+                      >
                           <div className="cell location-id">{litem.lid}</div>
+                          <div className="cell location-lng">{litem.lng}</div>
+                          <div className="cell location-lat">{litem.lat}</div>
                           <div className="cell location-userscount">{litem.users.length}</div>
                           <div className="cell location-weight">{litem.weight}</div>
                       </div>
                     })
                   }
+                  
               </div>
             </div>
 
