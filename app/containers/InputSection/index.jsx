@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Icon, Divider, InputNumber, Slider, Input } from 'antd';
+import * as d3 from 'd3';
+import { Button, Icon, Divider, InputNumber, Slider, Input, message } from 'antd';
 import { mapShotImg } from 'constants/mapconfig';
 import { generate_locations } from 'actions';
 
 import './index.scss';
 
-const marks = {
-  0: '0°C',
-  26: '26',
-  47: '47',
-  100: {
-    style: {
-      color: '#f50',
-    },
-    label: <strong>100°C</strong>,
-  },
+const success = (msg) => {
+  message.success(msg);
+};
+
+const error = (msg) => {
+  message.error(msg);
+};
+
+const warning = (msg) => {
+  message.warning(msg);
 };
 
 
@@ -26,9 +27,15 @@ class InputSection extends Component {
 
     this.state = {
       loadingLocation: false,
-      userid: undefined,
-      locations: [],
-      hotscale: []
+      userid: 22,
+      locations: [{
+        bounds: {
+          latrange: [40.477801417067724, 40.965600641811676],
+          lngrange: [-74.14907136830624, -73.85488618730457]
+        },
+        img: mapShotImg
+      }],
+      hotscale: [50, 100]
     }
   } 
 
@@ -50,26 +57,36 @@ class InputSection extends Component {
     
     this.setState({
       locations: [...this.state.locations, {
-        img: mapShotImg,
-        range: [-73, 41]
+        bounds: {
+          latrange: [40.477801417067724, 40.965600641811676],
+          lngrange: [-74.14907136830624, -73.85488618730457]
+        },
+        img: mapShotImg
       }]
     })
   }
 
   generateLocations() {
-    console.warn('generateLocations', this.state)
+    const { countrange } = this.props;
+    const { userid, locations, hotscale } = this.state;
     this.setState({
       loadingLocation: true
     })
-    const { userid, locations, hotscale } = this.state;
+    var d3hotcale = d3.scaleLinear().domain([0, 100]).range(countrange)
     this.props.generateLocations({
       userid,
       locations,
-      hotscale
+      hotscale: [Math.floor(d3hotcale(hotscale[0])), Math.ceil(d3hotcale(hotscale[1]))]
     }, () => {
       this.setState({
         loadingLocation: false
       })
+      location.hash = '#/solutions';
+    }, () => {
+      this.setState({
+        loadingLocation: false
+      })
+      warning('generate failed')
     })
   }
 
@@ -85,7 +102,18 @@ class InputSection extends Component {
 
 
   render() {
-    const { userid, loadingLocation } = this.state;
+    const { countrange } = this.props;
+    const { userid, loadingLocation, hotscale } = this.state;
+
+    const marks = {
+      0: `${countrange[0]}`,
+      100: {
+        style: {
+          color: '#f50',
+        },
+        label: countrange[1],
+      },
+    }
 
     return <div className="input-section-wrapper">
         <div className="section param-section">
@@ -111,7 +139,7 @@ class InputSection extends Component {
             <div className="param-item-content">
             {
               this.state.locations.map((item, index) => {
-                return <div className="location-preference-item" key={index}>
+                return <div className="location-preference-item" key={index} onClick={() => console.warn(item.bounds)}>
                     <img src={item.img} />
                 </div>
               })
@@ -128,7 +156,7 @@ class InputSection extends Component {
             <div className="param-item-title"><Icon type="tags" />hot scale</div>
             <div className="param-item-content">
 
-              <Slider className="hot-slider" size="small" range marks={marks} defaultValue={[26, 47]} 
+              <Slider className="hot-slider" size="small" range marks={marks} defaultValue={hotscale} 
                 onChange={this.onHotChange.bind(this)}/>
 
             </div>
@@ -145,8 +173,23 @@ class InputSection extends Component {
 }
 
 function mapStateToProps(store) {
+  var heatmapdata = store.heatmapdata;
+  var lmap = {};
+
+  heatmapdata.forEach(item => {
+    if(!lmap[item.lid]) {
+      lmap[item.lid] = {
+        count: 0
+      }
+    }
+    lmap[item.lid].count ++;
+  });
+  var counts = Object.keys(lmap).map(item => {
+   return lmap[item].count;
+  })
 
   return {
+    countrange: [Math.min(...counts, 0), Math.max(...counts, 0)]
   }
 }
 

@@ -205,8 +205,13 @@ export const get_alllocations_by_userlist = (users, successCb=console.log, failC
 
 export const generate_locations = (params, successCb=console.log, failCb=console.log) => {
   return (dispatch, getState) => {
-    console.warn(params);
-    setTimeout(successCb, 2000);
+    params.locations = params.locations.map(item => item.bounds)
+    api.post('/generate/locations', params)
+    .then((res) => {
+      console.warn('-----generate_locations-----succeee:', res);
+      successCb();
+    })
+    .catch(failCb)
   }
 }
 
