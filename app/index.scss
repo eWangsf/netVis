@@ -11,6 +11,10 @@ html, body, .layout, .main-section, .append-section {
   overflow: auto;
 }
 
+::-webkit-scrollbar{
+  display:none;
+}
+
 .layout {
   display: flex;
   background: $mainSectionBackground;

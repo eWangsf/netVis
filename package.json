@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@antv/g2": "^3.4.10",
     "ant-design-pro": "^2.2.1",
     "antd": "^3.15.0",
     "axios": "^0.18.0",

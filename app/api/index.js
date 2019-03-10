@@ -9,9 +9,19 @@ const hc = axios.create({
   timeout: 100000
 });
 
+
+
 class Api {
     websocket() {
 
+    }
+    getByUrl(path, params, withToken, verison) {
+      const hc_url = axios.create({
+        baseURL: path,
+        timeout: 100000
+      });
+      return hc_url.get('', {headers: this.getHeaders(withToken, verison), params})
+        .then(responseBody)
     }
     
     get(path, params, withToken, verison) {

@@ -1,0 +1,13 @@
+@import '../../variable.scss';
+
+.simplemap-wrapper {
+  margin: 10px;
+  height: 40%;
+  background: #fff;
+  border-radius: 10px;
+
+  .simplemap {
+    width: 100%;
+    height: 100%;
+  }
+}

@@ -11,6 +11,7 @@ var location = require('../location/location.js');
 var edge = require('../edge/edge.js');
 
 
+
 router.post('/checkin/bound',  (req, res, next) => {
 	checkin.getInBound(req, res, next);
 })
@@ -98,6 +99,7 @@ router.post('/generate/locations', (req, res, next) => {
 		locations
 	})
 })
+
 
 
 
