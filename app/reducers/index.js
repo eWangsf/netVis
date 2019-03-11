@@ -1,6 +1,8 @@
 import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_USERS_CHECKIN_TOTAL_SUCCESS,
   GET_HOTSPOTS_SUCCESS, GET_LOCATION_CHECKINS,
-  GET_LOCATIONS_BY_USERS
+  GET_LOCATIONS_BY_USERS,
+  GET_CHECKINS_BY_USERID_SUCCESS,
+  GET_CANDIDATES_DETAIL_SUCCESS
 } from 'constants/actionTypes.js';
 import update from 'immutability-helper';
 
@@ -11,7 +13,21 @@ const INITIAL_STATE = {
   edges: [],
   hotspots: [],
   checkins: [], 
-  locationlist: []
+  locationlist: [],
+  usercheckinlist: [],
+  candidates: [{
+    lid: 12821,
+    lat: 40.7657052487,
+    lng: -73.9472579956
+  }, {
+    lid: 11844,
+    lat: 40.7568799674,
+    lng: -73.9862251282
+  }, {
+    lid: 192190,
+    lat: 40.7342547336,
+    lng: -73.9918021586
+  }],
 
 
   // edges: [
@@ -84,6 +100,22 @@ export default function (state=INITIAL_STATE, action) {
     case GET_LOCATIONS_BY_USERS: {
       state = update(state, {
         locationlist: {
+          '$set': action.data
+        }
+      });
+      break;
+    }
+    case GET_CHECKINS_BY_USERID_SUCCESS: {
+      state = update(state, {
+        usercheckinlist: {
+          '$set': action.data
+        }
+      });
+      break;
+    }
+    case GET_CANDIDATES_DETAIL_SUCCESS: {
+      state = update(state, {
+        candidates: {
           '$set': action.data
         }
       });

@@ -3,8 +3,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import SimpleMapSection from 'containers/SimpleMapSection';
-// import MapSection from 'containers/MapSection';
-// import TimelineSection from 'containers/TimelineSection';
+import { get_candidates_detail } from 'actions';
+
+import RoseSection from 'containers/RoseSection';
+import CandidatedescSection from 'containers/CandidatedescSection';
 // import OperationSection from 'containers/OperationSection';
 
 import {  } from 'actions';
@@ -23,21 +25,34 @@ class SolutionsView extends Component {
   // }
 
   componentDidMount() {
+    this.props.getCandidatesDetail();
+
   }
 
   render() {
     
     return <div className="layout solutions-layout">
-              <div className="left">
-                <div className="top">
-                    <SimpleMapSection />
+              <div className="top">
+                <div className="left">
+                    <SimpleMapSection  candidates={this.props.candidates}/>
                 </div>
-                <div className="bottom">
-                barchart
+                <div className="middle">
+                  <RoseSection candidates={this.props.candidates} />
+                    {/* <div className="roseview-wrapper">
+                    玫瑰图
+                    </div> */}
+                </div>
+                <div className="right">
+                  <CandidatedescSection candidate={this.props.candidates[0]} />
+                  {/* <div className="locationdetail-wrapper">
+                  地点详情
+                  </div> */}
                 </div>
               </div>
-              <div className="right">
-              timeline
+              <div className="bottom">
+                <div className="compare-wrapper">
+                  compare
+                </div>
               </div>
             
       </div>
@@ -46,12 +61,16 @@ class SolutionsView extends Component {
 
 function mapStateToProps(store) {
   return {
+    candidates: store.candidates,
     // heatmapdata: store.heatmapdata,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+    getCandidatesDetail(successCb, failCb) {
+      dispatch(get_candidates_detail(successCb, failCb));
+    },
     // getHeatByBound(bounds, successCb, failCb) {
     //   dispatch(get_heat_in_bound(bounds, successCb, failCb))
     // },

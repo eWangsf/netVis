@@ -1,6 +1,7 @@
 @import '../../variable.scss';
 
 .mapview-layout {
+  display: flex;
   .left {
     flex: 1;
   }

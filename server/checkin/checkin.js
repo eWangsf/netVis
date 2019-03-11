@@ -139,5 +139,22 @@ module.exports = {
         connection.release();
       });
     });
-  }
+  },
+  getCheckinsByLid(lid, resolve, reject) {
+    pool.getConnection(function(err, connection) {
+      connection.query($sql.checkinByLid, [lid], function (err, result) {
+        if(typeof result === 'undefined') {
+          reject(err);
+          connection.release();
+          return ;
+        }
+
+        resolve({
+          lid: lid,
+          data: result
+        });
+        connection.release();
+      });
+    });
+  },
 }

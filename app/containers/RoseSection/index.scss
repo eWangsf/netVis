@@ -1,16 +1,15 @@
 @import '../../variable.scss';
 
-.simplemap-wrapper {
+.rose-section-wrapper {
   margin-right: 10px;
-  background: #fff;
+  padding: 5px;
   height: 100%;
+  background: #fff;
   border-radius: 10px;
 
-  .simplemap {
-    width: 100%;
+  .rosecontainer {
     height: 100%;
     position: relative;
-    border-radius: 10px;
-
   }
+
 }

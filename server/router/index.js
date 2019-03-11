@@ -100,6 +100,59 @@ router.post('/generate/locations', (req, res, next) => {
 	})
 })
 
+router.get('/checkin/user', (req, res, next) => {
+	var userid = +req.query.userid;
+
+	var promise = new Promise((resolve, reject) => {
+		checkin.getCheckinsByUid(userid, resolve, reject);
+	})
+
+	promise.then(checkins => {
+		res.json({
+			code: 200,
+			data: checkins,
+			userid
+		})
+	})
+	.catch(err => {
+		res.json({
+			code: 1,
+			msg: err
+		})
+	})
+})
+
+router.post('/candidates/detail', (req, res, next) => {
+		var params = req.body,
+				candidates = params.candidates;
+
+		var promises = candidates.map((citem) => {
+				var lid = +citem.lid;
+				return new Promise((resolve, reject) => {
+					checkin.getCheckinsByLid(lid, resolve, reject);
+				})
+		});
+		Promise.all(promises)
+		.then(results => {
+			candidates.map(item => {
+				var checkins = results.find(ritem => +ritem.lid === +item.lid);
+				item.checkins = checkins.data;
+				return item;
+			})
+			res.json({
+				code: 200,
+				data: candidates,
+			})
+		})
+		.catch(err => {
+			res.json({
+				code: 1,
+				err
+			})
+		})
+		
+})
+
 
 
 

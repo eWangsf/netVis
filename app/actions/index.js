@@ -3,7 +3,9 @@ import api from '../api'
 import { GET_HEATMAP_SUCCESS, SAVE_CHECKIN_GROUPS, GET_EDGES_SUCCESS, GET_USERS_CHECKIN_TOTAL_SUCCESS,
   GET_HOTSPOTS_SUCCESS,
   GET_LOCATION_CHECKINS,
-  GET_LOCATIONS_BY_USERS
+  GET_LOCATIONS_BY_USERS,
+  GET_CHECKINS_BY_USERID_SUCCESS,
+  GET_CANDIDATES_DETAIL_SUCCESS
   } from '../constants/actionTypes';
 
 var bound_seed = 0;
@@ -212,6 +214,44 @@ export const generate_locations = (params, successCb=console.log, failCb=console
       successCb();
     })
     .catch(failCb)
+  }
+}
+
+export const get_user_checkins = (successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    api.get('/checkin/user', {
+      userid: 22
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        dispatch({
+          type: GET_CHECKINS_BY_USERID_SUCCESS,
+          data: res.data
+        })
+        successCb();
+      }
+    })
+
+  }
+}
+
+export const get_candidates_detail = (successCb=console.log, failCb=console.log) => {
+  return (dispatch, getState) => {
+    var store = getState();
+    var candidates = store.candidates;
+    api.post('/candidates/detail', {
+      candidates
+    })
+    .then(res => {
+      if(res && res.code === 200) {
+        dispatch({
+          type: GET_CANDIDATES_DETAIL_SUCCESS,
+          data: res.data
+        })
+        successCb();
+      }
+    })
+
   }
 }
 
