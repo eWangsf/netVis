@@ -214,9 +214,6 @@ class CompareSection extends Component {
                   }) : null
                 }
 
-      
-                 
-                
                 </div>
                 {/* <div className="top-bubble-cell" style={{
                   width: 2*bubbleradius,
