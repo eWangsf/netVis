@@ -7,7 +7,7 @@ import { get_candidates_detail } from 'actions';
 
 import RoseSection from 'containers/RoseSection';
 import CandidatedescSection from 'containers/CandidatedescSection';
-// import OperationSection from 'containers/OperationSection';
+import CompareSection from 'containers/CompareSection';
 
 import {  } from 'actions';
 import './index.scss';
@@ -50,9 +50,10 @@ class SolutionsView extends Component {
                 </div>
               </div>
               <div className="bottom">
-                <div className="compare-wrapper">
+                <CompareSection candidates={this.props.candidates}/>
+                {/* <div className="compare-wrapper">
                   compare
-                </div>
+                </div> */}
               </div>
             
       </div>
@@ -71,9 +72,6 @@ function mapDispatchToProps(dispatch) {
     getCandidatesDetail(successCb, failCb) {
       dispatch(get_candidates_detail(successCb, failCb));
     },
-    // getHeatByBound(bounds, successCb, failCb) {
-    //   dispatch(get_heat_in_bound(bounds, successCb, failCb))
-    // },
   }
 }
 
