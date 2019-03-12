@@ -186,6 +186,10 @@ class CompareSection extends Component {
 
   }
 
+  bandwidthChange() {
+    
+  }
+
   render() {
     const { solutions } = this.state;
 
@@ -230,6 +234,9 @@ class CompareSection extends Component {
         </div>
         <svg className="comparesvg" id="comparesvg">
         </svg>
+        <div className="bandwidth-change" >
+
+        </div>
     </div>
   }
 

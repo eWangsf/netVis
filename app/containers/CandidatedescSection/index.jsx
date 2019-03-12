@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import G2 from '@antv/g2';
 import * as d3 from 'd3';
+import Dash from 'components/dash';
 
 import './index.scss';
 
@@ -28,7 +29,13 @@ class CandidatedescSection extends Component {
     const { candidate } = this.props;
     
     return <div className="candidatedesc-section-wrapper">
-        detail-{candidate.lid}
+        <div className="dash-row">
+          <Dash percent={30}></Dash>
+        </div>
+        <div className="location-base-info-row">
+            <div className="numberlogo"></div>
+            <div className="location-id">{candidate.lid}</div>
+        </div>
 
      
     </div>
