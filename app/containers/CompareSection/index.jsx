@@ -124,7 +124,6 @@ class CompareSection extends Component {
 
     this.clearSvg();
     
-    console.warn(solutions);
     if(!solutions[0].data) {
       setTimeout(this.getSolutions, 1000);
       return ;
@@ -242,9 +241,9 @@ class CompareSection extends Component {
         <svg className="comparesvg" id="comparesvg">
         </svg>
         <div className="bandwidth-change" >
-            <div className={`item day ${this.state.bwtype === 1 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 1)}></div>
-            <div className={`item month ${this.state.bwtype === 30 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 30)}></div>
-            <div className={`item year ${this.state.bwtype === 365 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 365)}></div>
+            <div className={`item day ${this.state.bwtype === 1 ? 'selected' : ''}`} title="daily" onClick={this.bandwidthChange.bind(this, 1)}></div>
+            <div className={`item month ${this.state.bwtype === 30 ? 'selected' : ''}`} title="monthly" onClick={this.bandwidthChange.bind(this, 30)}></div>
+            <div className={`item year ${this.state.bwtype === 365 ? 'selected' : ''}`} title="yearly" onClick={this.bandwidthChange.bind(this, 365)}></div>
         </div>
     </div>
   }
