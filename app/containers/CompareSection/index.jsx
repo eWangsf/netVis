@@ -40,6 +40,7 @@ class CompareSection extends Component {
 
     this.state = {
       candidatescheckins: [],
+      bwtype: 1
     }
   }
 
@@ -186,8 +187,14 @@ class CompareSection extends Component {
 
   }
 
-  bandwidthChange() {
-    
+  bandwidthChange(value) {
+    this.setState({
+      bwtype: value
+    })
+
+    bandwidth = value*24*3600*1000;
+
+    setTimeout(this.getSolutions, 300);
   }
 
   render() {
@@ -235,7 +242,9 @@ class CompareSection extends Component {
         <svg className="comparesvg" id="comparesvg">
         </svg>
         <div className="bandwidth-change" >
-
+            <div className={`item day ${this.state.bwtype === 1 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 1)}></div>
+            <div className={`item month ${this.state.bwtype === 30 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 30)}></div>
+            <div className={`item year ${this.state.bwtype === 365 ? 'selected' : ''}`} onClick={this.bandwidthChange.bind(this, 365)}></div>
         </div>
     </div>
   }
