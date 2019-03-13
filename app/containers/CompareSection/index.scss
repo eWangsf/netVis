@@ -56,6 +56,17 @@
     }
     .checkinbubble:hover {
       fill: rgba(251, 123, 41, 0.7);
+    }
+    .markline {
+      stroke: #aaa;
+      stroke-dasharray: 3;
+    }
+    .marktext {
+      fill: #aaa;
+      dominant-baseline: middle;
+      alignment-baseline: middle;
+      text-anchor: end;
+      transform: rotate3d(0, 0, 1, -25deg);
 
     }
   }

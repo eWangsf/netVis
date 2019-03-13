@@ -5,6 +5,7 @@ import Circle from 'components/circle';
 import * as d3 from 'd3';
 
 import './index.scss';
+import { func } from 'prop-types';
 
 var containersize = {
   width: 0,
@@ -27,7 +28,7 @@ var locationbaseyscale = d3.scaleLinear().domain([0, 0]).range([margin.top, cont
 var checkinsizescale = d3.scaleLinear().domain([0, 0]).range([0, bubbleradius]);
 var timescale = d3.scaleLinear().domain([0, 0]).range([0, containersize.width]);
 
-var bandwidth = 3600*24*1000*15; //1 day
+var bandwidth = 3600*24*1000*30; //1 day
 
 class CompareSection extends Component {
 
@@ -37,10 +38,10 @@ class CompareSection extends Component {
     this.getSolutions = this.getSolutions.bind(this);
     this.drawSolution = this.drawSolution.bind(this);
     this.clearSvg = this.clearSvg.bind(this);
+    this.drawMarks = this.drawMarks.bind(this);
 
     this.state = {
-      candidatescheckins: [],
-      bwtype: 1
+      bwtype: 2
     }
   }
 
@@ -101,7 +102,7 @@ class CompareSection extends Component {
 
     return {
       ...state,
-      solutions: candidates
+      solutions: candidates,
     }
   }
 
@@ -133,6 +134,10 @@ class CompareSection extends Component {
       solution.data.sort((x, y) => {
         return x.timestamp > y.timestamp ? 1 : -1;
       })
+      var marks = solution.data.filter(item => item.checkins.length > (0.55 * (checkinsizescale.domain()[1]-checkinsizescale.domain()[0] + checkinsizescale.domain()[0]))).map(item => item.timestamp);
+      solution.marks = marks;
+
+      this.drawMarks(solution);
       this.drawSolution(solution);
     })
 
@@ -143,10 +148,8 @@ class CompareSection extends Component {
     svg.selectAll('g').remove();
   }
 
-  drawSolution(solution) {
-
-    // var timelinedata = this.changeCheckinRecords();
-    // console.warn(timelinedata)
+  drawMarks(solution) {
+    var marks = solution.marks;
 
     var svg = d3.select('#comparesvg');
 
@@ -155,6 +158,53 @@ class CompareSection extends Component {
     .style("transform", function (d, i) {
       return `translate3d(${margin.left}px, ${locationbaseyscale(solution.index)}px, 0)`
     });
+    
+    var marksgroup = locationBubblegroup.append('g')
+      .attr('class', 'marksgroup')
+      .style('transform', `translate3d(0, ${bubbleradius}px, 0)`);
+
+      marksgroup.selectAll('.markline')
+      .data(marks)
+      .enter()
+      .append('line')
+      .attr('class', 'markline')
+      .attr('x1', function (d, i) {
+        return timescale(+d)
+      })
+      .attr('y1', 0)
+      .attr('x2', function (d, i) {
+        return timescale(+d)
+      })
+      .attr('y2', function(d, i) {
+        return locationbaseyscale.range()[1] - locationbaseyscale.range()[0] - (locationbaseyscale(solution.index)) + 2*bubbleradius + 10;
+      })
+    
+      marksgroup.selectAll('.marktext')
+      .data(marks)
+      .enter()
+      .append('text')
+      .attr('class', 'marktext')
+      .attr('x', function (d, i) {
+        return timescale(+d)
+      })
+      .attr('y', function(d, i) {
+        return locationbaseyscale.range()[1]-locationbaseyscale(solution.index)+2*bubbleradius;
+      })
+      .style('transform-origin', function(d, i) {
+        return `${timescale(+d)}px ${locationbaseyscale.range()[1]-locationbaseyscale(solution.index)+2*bubbleradius}px`
+      })
+      .text(function(d, i) {
+        var date = new Date(+d);
+        return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+      })
+
+
+  }
+
+  drawSolution(solution) {
+    var svg = d3.select('#comparesvg');
+
+    var locationBubblegroup = svg.select(`.topBubblegroup${solution.lid}`)
 
     locationBubblegroup.append('circle')
     .attr('class', `topBubble topBubble${solution.lid}`)
@@ -164,11 +214,6 @@ class CompareSection extends Component {
     })
     .attr('r', bubbleradius-rowpadding);
 
-    // var checkingroups = locationBubblesgroups.append('g')
-    // .attr('class', 'checkinbubblesgroup')
-    // .style('transform', `translate3d(${2*bubbleradius+margin.left+10}px, 0, 0)`);
-
-    console.warn(solution.data)
     locationBubblegroup.selectAll('.checkinbubble')
     .data(solution.data)
     .enter()
@@ -225,14 +270,6 @@ class CompareSection extends Component {
                 }
 
                 </div>
-                {/* <div className="top-bubble-cell" style={{
-                  width: 2*bubbleradius,
-                  height: 2*bubbleradius
-                }}>
-                </div>
-                <div className="timeline-bubbles" id={`timeline-bubble-${item.lid}`}>
-
-                </div> */}
               
               </div>
             })
